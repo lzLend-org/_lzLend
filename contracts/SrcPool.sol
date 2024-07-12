@@ -113,6 +113,7 @@ contract SrcPool is OApp {
             (address, uint256)
         );
         // TODO: INSERT ORACLES HERE...
+        // TODO: LOGIC HERE IS WRONG...
         uint256 loanAmount = (collateral * ltv) / 100;
         require(poolBalance >= loanAmount, "Pool: insufficient balance");
         loans[borrower] = Loan(
@@ -122,6 +123,8 @@ contract SrcPool is OApp {
             borrower
         );
         poolBalance -= loanAmount;
+
+        // IERC20(poolToken).approve(address(this), loanAmount);
         IERC20(poolToken).transferFrom(address(this), borrower, loanAmount);
     }
 }

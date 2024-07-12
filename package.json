@@ -1,10 +1,12 @@
 {
   "name": "hardhat-project",
   "devDependencies": {
+    "@flarenetwork/flare-periphery-contracts": "^0.1.12",
     "@layerzerolabs/lz-evm-oapp-v2": "^2.3.29",
     "@layerzerolabs/lz-evm-protocol-v2": "^2.3.29",
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
     "@openzeppelin/contracts": "^5.0.1",
+    "@pythnetwork/pyth-sdk-solidity": "^3.1.0",
     "dotenv": "^16.4.5",
     "hardhat": "^2.22.6",
     "lz-evm-protocol-v2,": "link:@layerzerolabs/lz-evm-protocol-v2,",
