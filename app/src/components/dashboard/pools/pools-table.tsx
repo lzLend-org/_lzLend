@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-import { NewDepositModal } from "@/components/dashboard/deposits/new-deposit-modal";
+import { Address } from "@/components/address";
+import { NewLoanModal } from "@/components/dashboard/loans/new-loan-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -17,10 +18,10 @@ import { ETH, USDC } from "@/lib/assets";
 import { Deposit } from "@/lib/types";
 import { getDaysDifference } from "@/lib/utils";
 
-const deposits: Deposit[] = [
+const pools: Deposit[] = [
   {
     chain: "Ethereum",
-    asset: ETH,
+    asset: USDC,
     amount: 1.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "2%",
@@ -36,7 +37,7 @@ const deposits: Deposit[] = [
   },
   {
     chain: "Ethereum",
-    asset: USDC,
+    asset: ETH,
     amount: 2.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "5.2%",
@@ -44,7 +45,7 @@ const deposits: Deposit[] = [
   },
   {
     chain: "Bitcoin",
-    asset: USDC,
+    asset: ETH,
     amount: 0.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "4.8%",
@@ -52,7 +53,7 @@ const deposits: Deposit[] = [
   },
   {
     chain: "Ethereum",
-    asset: USDC,
+    asset: ETH,
     amount: 5000,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "3.2%",
@@ -60,15 +61,14 @@ const deposits: Deposit[] = [
   },
 ];
 
-export function DepositsTable() {
+export function PoolsTable() {
+  const [selectedPool, setSelectedPool] = useState<Deposit | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Active Deposits</CardTitle>
-        <Button onClick={() => setIsModalOpen(true)}>New Deposit</Button>
-        <NewDepositModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+      <CardHeader className="flex flex-row items-center justify-between py-6">
+        <CardTitle>Pools</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -78,35 +78,49 @@ export function DepositsTable() {
               <TableHead>Asset</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Interest Rate</TableHead>
+              <TableHead>By</TableHead>
               <TableHead>Locked Days</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {deposits.map((deposit, index) => (
+            {pools.map((pool, index) => (
               <TableRow key={index}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <span>{deposit.chain}</span>
+                    <span>{pool.chain}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <span>{deposit.asset.symbol}</span>
+                    <span>{pool.asset.symbol}</span>
                   </div>
                 </TableCell>
-                <TableCell>{deposit.amount}</TableCell>
-                <TableCell>{deposit.interestRate}</TableCell>
-                <TableCell>{getDaysDifference(deposit.unlockDate)} days</TableCell>
+                <TableCell>{pool.amount}</TableCell>
+                <TableCell>{pool.interestRate}</TableCell>
                 <TableCell>
-                  <Button size="sm" variant="outline">
-                    List for Sale
+                  <Address address={pool.owner} />
+                </TableCell>
+                <TableCell>{getDaysDifference(pool.unlockDate)} days</TableCell>
+                <TableCell>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setIsModalOpen(true);
+                      setSelectedPool(pool);
+                    }}
+                  >
+                    Borrow
                   </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        {selectedPool && (
+          <NewLoanModal pool={selectedPool} onOpenChange={setIsModalOpen} open={isModalOpen} />
+        )}
       </CardContent>
     </Card>
   );

@@ -40,3 +40,7 @@ export function copyToClipboard(str: string) {
 export function getAddressExplorerLink(address: string) {
   return `https://etherscan.io/address/${address}`;
 }
+
+export function getDaysDifference(timestamp: number) {
+  return Math.round((timestamp - Date.now()) / (1000 * 60 * 60 * 24));
+}

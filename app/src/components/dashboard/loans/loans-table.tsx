@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -8,21 +10,13 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-
-interface Loan {
-  chain: string;
-  asset: string;
-  amount: string;
-  collateralChain: string;
-  collateralAsset: string;
-  collateralAmount: string;
-  interestRate: string;
-}
+import { ETH, USDC } from "@/lib/assets";
+import { Loan } from "@/lib/types";
 
 const loans: Loan[] = [
   {
     chain: "Ethereum",
-    asset: "ETH",
+    asset: ETH,
     amount: "1.5",
     collateralChain: "Ethereum",
     collateralAsset: "ETH",
@@ -31,7 +25,7 @@ const loans: Loan[] = [
   },
   {
     chain: "Bitcoin",
-    asset: "BTC",
+    asset: USDC,
     amount: "0.5",
     collateralChain: "Ethereum",
     collateralAsset: "ETH",
@@ -40,7 +34,7 @@ const loans: Loan[] = [
   },
   {
     chain: "Ethereum",
-    asset: "ETH",
+    asset: USDC,
     amount: "2.5",
     collateralChain: "Ethereum",
     collateralAsset: "ETH",
@@ -49,7 +43,7 @@ const loans: Loan[] = [
   },
   {
     chain: "Bitcoin",
-    asset: "BTC",
+    asset: USDC,
     amount: "0.5",
     collateralChain: "Ethereum",
     collateralAsset: "ETH",
@@ -58,7 +52,7 @@ const loans: Loan[] = [
   },
   {
     chain: "Ethereum",
-    asset: "DAI",
+    asset: USDC,
     amount: "5,000",
     collateralChain: "Ethereum",
     collateralAsset: "ETH",
@@ -70,8 +64,11 @@ const loans: Loan[] = [
 export function LoansTable() {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Active Loans</CardTitle>
+        <Button>
+          <Link href={"/pools"}>New Loan</Link>
+        </Button>
       </CardHeader>
       <CardContent>
         <Table>
@@ -97,7 +94,7 @@ export function LoansTable() {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <span>{loan.asset}</span>
+                    <span>{loan.asset.symbol}</span>
                   </div>
                 </TableCell>
                 <TableCell>{loan.amount}</TableCell>

@@ -20,6 +20,7 @@ const createDepositSchema = z.object({
   asset: z.string().min(1),
   amount: z.number().gt(0),
   interestRate: z.number().gt(0),
+  daysLocked: z.number().gt(0),
 });
 
 type CreateDepositData = z.infer<typeof createDepositSchema>;
@@ -39,6 +40,7 @@ export function NewDepositModal({ open, onOpenChange }: BaseDialogProps) {
       asset: chainAssets[0].address,
       amount: 0,
       interestRate: 0,
+      daysLocked: 30,
     },
   });
 
@@ -87,6 +89,7 @@ export function NewDepositModal({ open, onOpenChange }: BaseDialogProps) {
               autoCapitalize="none"
               autoCorrect="off"
               autoComplete="off"
+              step={0.01}
               // disabled={isPending}
               {...register("amount", { valueAsNumber: true })}
             />
@@ -105,11 +108,31 @@ export function NewDepositModal({ open, onOpenChange }: BaseDialogProps) {
               autoCapitalize="none"
               autoCorrect="off"
               autoComplete="off"
+              step={0.01}
               // disabled={isPending}
               {...register("interestRate", { valueAsNumber: true })}
             />
             {errors?.interestRate && (
               <p className="px-1 text-xs text-destructive">{errors.interestRate.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label className="mb-2 block" htmlFor="name">
+              Days Locked
+            </Label>
+            <Input
+              id="name"
+              type="number"
+              autoCapitalize="none"
+              autoCorrect="off"
+              autoComplete="off"
+              step={1}
+              // disabled={isPending}
+              {...register("daysLocked", { valueAsNumber: true })}
+            />
+            {errors?.daysLocked && (
+              <p className="px-1 text-xs text-destructive">{errors.daysLocked.message}</p>
             )}
           </div>
 
