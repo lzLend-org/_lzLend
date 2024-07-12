@@ -17,6 +17,10 @@ const config: HardhatUserConfig = {
       url: process.env.SEPOLIA_RPC_URL || "https://rpc.ankr.com/eth_sepolia",
       accounts,
     },
+    optimism_sepolia: {
+      url: process.env.OPTIMISM_SEPOLIA_RPC_URL || "https://rpc.ankr.com/optimism_sepolia",
+      accounts,
+    },
     mumbai: {
       url: process.env.MUMBAI_RPC_URL || "https://rpc.ankr.com/polygon_mumbai",
       accounts,
