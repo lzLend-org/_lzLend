@@ -7,6 +7,8 @@ import "./SrcPool.sol";
 contract PoolFactory {
     mapping(address => address[]) private ownerToSrcPools;
     mapping(address => address[]) private ownerToDstPools;
+    address[] private allSrcPools;
+    address[] private allDstPools;
 
     function deploySrcPool(
         address _endpoint,
@@ -29,6 +31,7 @@ contract PoolFactory {
             _expiry
         );
         ownerToSrcPools[msg.sender].push(address(pool));
+        allSrcPools.push(address(pool));
         return address(pool);
     }
 
@@ -45,6 +48,7 @@ contract PoolFactory {
             _dstChainId
         );
         ownerToDstPools[msg.sender].push(address(pool));
+        allDstPools.push(address(pool));
         return address(pool);
     }
 
@@ -56,5 +60,13 @@ contract PoolFactory {
 
     function getDstPoolsByOwner(address _owner) external view returns (address[] memory) {
         return ownerToDstPools[_owner];
+    }
+
+    function getAllSrcPools() external view returns (address[] memory) {
+        return allSrcPools;
+    }
+
+    function getAllDstPools() external view returns (address[] memory) {
+        return allDstPools;
     }
 }
