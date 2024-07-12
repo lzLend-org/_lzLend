@@ -24,8 +24,6 @@ contract SrcPool is OApp {
 
     mapping(address => Loan) public loans;
 
-    event Deposit(uint256 amount);
-
     constructor(
         address _endpoint,
         address _delegate,
@@ -90,7 +88,6 @@ contract SrcPool is OApp {
         );
         IERC20(poolToken).transferFrom(msg.sender, address(this), _amount);
         poolBalance += _amount;
-        emit Deposit(_amount);
     }
 
     function getRepaymentAmount(address _sender) public view returns (uint256) {
