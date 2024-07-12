@@ -1,6 +1,6 @@
 import "./globals.css";
 
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 
 import Providers from "@/app/providers";
 import { Header } from "@/components/layout/header";
@@ -8,11 +8,10 @@ import { cn } from "@/lib/utils";
 
 import type { Metadata } from "next";
 
-const fontSans = Inter({ subsets: ["latin"], variable: "--font-sans" });
-
-const fontHeading = Inter({
-  subsets: ["latin"],
-  variable: "--font-heading",
+const fontSans = localFont({
+  src: "./general-sans.ttf",
+  display: "swap",
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
@@ -27,13 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={cn(
-          "min-h-screen font-sans antialiased",
-          fontSans.variable,
-          fontHeading.variable,
-        )}
-      >
+      <body className={cn("min-h-screen font-sans antialiased", fontSans.variable)}>
         <Providers>
           <div className="flex min-h-screen flex-col">
             <Header />
