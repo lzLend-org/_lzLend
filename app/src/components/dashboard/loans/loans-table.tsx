@@ -69,7 +69,7 @@ const loans: Loan[] = [
 
 export function LoansTable() {
   return (
-    <Card className="col-span-1 md:col-span-2 lg:col-span-3">
+    <Card>
       <CardHeader>
         <CardTitle>Active Loans</CardTitle>
       </CardHeader>

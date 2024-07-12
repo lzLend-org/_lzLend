@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+
+import { NewDepositModal } from "@/components/dashboard/deposits/new-deposit-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -50,10 +55,14 @@ const deposits: Deposit[] = [
 ];
 
 export function DepositsTable() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
-    <Card className="col-span-1 md:col-span-2 lg:col-span-3">
-      <CardHeader>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Active Deposits</CardTitle>
+        <Button onClick={() => setIsModalOpen(true)}>New Deposit</Button>
+        <NewDepositModal open={isModalOpen} onOpenChange={setIsModalOpen} />
       </CardHeader>
       <CardContent>
         <Table>
