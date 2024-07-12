@@ -1,5 +1,9 @@
-import Link from "next/link";
+"use client";
 
+import Link from "next/link";
+import { useState } from "react";
+
+import { RepayLoanModal } from "@/components/dashboard/loans/repay-loan-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -17,7 +21,7 @@ const loans: Loan[] = [
   {
     chain: "Ethereum",
     asset: ETH,
-    amount: "1.5",
+    amount: 1.5,
     collateralChain: "Ethereum",
     collateralAsset: "ETH",
     collateralAmount: "1.5",
@@ -26,7 +30,7 @@ const loans: Loan[] = [
   {
     chain: "Bitcoin",
     asset: USDC,
-    amount: "0.5",
+    amount: 0.5,
     collateralChain: "Ethereum",
     collateralAsset: "ETH",
     collateralAmount: "1.5",
@@ -35,7 +39,7 @@ const loans: Loan[] = [
   {
     chain: "Ethereum",
     asset: USDC,
-    amount: "2.5",
+    amount: 2.5,
     collateralChain: "Ethereum",
     collateralAsset: "ETH",
     collateralAmount: "1.5",
@@ -44,7 +48,7 @@ const loans: Loan[] = [
   {
     chain: "Bitcoin",
     asset: USDC,
-    amount: "0.5",
+    amount: 0.5,
     collateralChain: "Ethereum",
     collateralAsset: "ETH",
     collateralAmount: "1.5",
@@ -53,7 +57,7 @@ const loans: Loan[] = [
   {
     chain: "Ethereum",
     asset: USDC,
-    amount: "5,000",
+    amount: 5000,
     collateralChain: "Ethereum",
     collateralAsset: "ETH",
     collateralAmount: "1.5",
@@ -62,6 +66,9 @@ const loans: Loan[] = [
 ];
 
 export function LoansTable() {
+  const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -111,7 +118,14 @@ export function LoansTable() {
                 </TableCell>
                 <TableCell>{loan.collateralAmount}</TableCell>
                 <TableCell>
-                  <Button size="sm" variant="outline">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setIsModalOpen(true);
+                      setSelectedLoan(loan);
+                    }}
+                  >
                     Repay
                   </Button>
                 </TableCell>
@@ -119,6 +133,9 @@ export function LoansTable() {
             ))}
           </TableBody>
         </Table>
+        {selectedLoan && (
+          <RepayLoanModal loan={selectedLoan} onOpenChange={setIsModalOpen} open={isModalOpen} />
+        )}
       </CardContent>
     </Card>
   );

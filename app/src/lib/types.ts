@@ -19,7 +19,7 @@ export interface Deposit {
 export interface Loan {
   chain: string;
   asset: Asset;
-  amount: string;
+  amount: number;
   collateralChain: string;
   collateralAsset: string;
   collateralAmount: string;
