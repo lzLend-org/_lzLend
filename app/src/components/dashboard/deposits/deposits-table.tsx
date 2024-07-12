@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { mainnet } from "viem/chains";
+import { useChains } from "wagmi";
 
 import { NewDepositModal } from "@/components/dashboard/deposits/new-deposit-modal";
 import { Button } from "@/components/ui/button";
@@ -25,6 +27,8 @@ const deposits: Deposit[] = [
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "2%",
     unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    collateralChainId: mainnet.id,
+    ltv: 0.5,
   },
   {
     chain: "Bitcoin",
@@ -33,6 +37,8 @@ const deposits: Deposit[] = [
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "3%",
     unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 60,
+    collateralChainId: mainnet.id,
+    ltv: 0.5,
   },
   {
     chain: "Ethereum",
@@ -41,6 +47,8 @@ const deposits: Deposit[] = [
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "5.2%",
     unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 80,
+    collateralChainId: mainnet.id,
+    ltv: 0.5,
   },
   {
     chain: "Bitcoin",
@@ -49,6 +57,8 @@ const deposits: Deposit[] = [
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "4.8%",
     unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    collateralChainId: mainnet.id,
+    ltv: 0.5,
   },
   {
     chain: "Ethereum",
@@ -57,10 +67,14 @@ const deposits: Deposit[] = [
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "3.2%",
     unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    collateralChainId: mainnet.id,
+    ltv: 0.5,
   },
 ];
 
 export function DepositsTable() {
+  const chains = useChains();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -79,6 +93,8 @@ export function DepositsTable() {
               <TableHead>Amount</TableHead>
               <TableHead>Interest Rate</TableHead>
               <TableHead>Locked Days</TableHead>
+              <TableHead>Collateral Chain</TableHead>
+              <TableHead>LTV</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -98,6 +114,10 @@ export function DepositsTable() {
                 <TableCell>{deposit.amount}</TableCell>
                 <TableCell>{deposit.interestRate}</TableCell>
                 <TableCell>{getDaysDifference(deposit.unlockDate)} days</TableCell>
+                <TableCell>
+                  {chains.find((chain) => chain.id === deposit.collateralChainId)?.name}
+                </TableCell>
+                <TableCell>{deposit.ltv}</TableCell>
                 <TableCell>
                   <Button size="sm" variant="outline">
                     List for Sale

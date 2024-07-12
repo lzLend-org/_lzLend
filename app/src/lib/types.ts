@@ -12,6 +12,8 @@ export interface Deposit {
   owner: `0x${string}`;
   interestRate: string;
   unlockDate: number;
+  collateralChainId: number;
+  ltv: number;
 }
 
 export interface Loan {

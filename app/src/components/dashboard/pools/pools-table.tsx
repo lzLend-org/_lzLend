@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { mainnet, sepolia } from "viem/chains";
+import { useChains } from "wagmi";
 
 import { Address } from "@/components/address";
 import { NewLoanModal } from "@/components/dashboard/loans/new-loan-modal";
@@ -26,6 +28,8 @@ const pools: Deposit[] = [
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "2%",
     unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    collateralChainId: mainnet.id,
+    ltv: 0.5,
   },
   {
     chain: "Bitcoin",
@@ -34,6 +38,8 @@ const pools: Deposit[] = [
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "3%",
     unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 60,
+    collateralChainId: sepolia.id,
+    ltv: 0.5,
   },
   {
     chain: "Ethereum",
@@ -42,6 +48,8 @@ const pools: Deposit[] = [
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "5.2%",
     unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 80,
+    collateralChainId: mainnet.id,
+    ltv: 0.5,
   },
   {
     chain: "Bitcoin",
@@ -50,6 +58,8 @@ const pools: Deposit[] = [
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "4.8%",
     unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    collateralChainId: mainnet.id,
+    ltv: 0.5,
   },
   {
     chain: "Ethereum",
@@ -58,10 +68,14 @@ const pools: Deposit[] = [
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     interestRate: "3.2%",
     unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    collateralChainId: mainnet.id,
+    ltv: 0.5,
   },
 ];
 
 export function PoolsTable() {
+  const chains = useChains();
+
   const [selectedPool, setSelectedPool] = useState<Deposit | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -80,6 +94,8 @@ export function PoolsTable() {
               <TableHead>Interest Rate</TableHead>
               <TableHead>By</TableHead>
               <TableHead>Locked Days</TableHead>
+              <TableHead>Collateral Chain</TableHead>
+              <TableHead>LTV</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -102,6 +118,10 @@ export function PoolsTable() {
                   <Address address={pool.owner} />
                 </TableCell>
                 <TableCell>{getDaysDifference(pool.unlockDate)} days</TableCell>
+                <TableCell>
+                  {chains.find((chain) => chain.id === pool.collateralChainId)?.name}
+                </TableCell>
+                <TableCell>{pool.ltv}</TableCell>
                 <TableCell>
                   <Button
                     size="sm"

@@ -66,9 +66,9 @@ export function LoansTable() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Active Loans</CardTitle>
-        <Button>
-          <Link href={"/pools"}>New Loan</Link>
-        </Button>
+        <Link href={"/pools"}>
+          <Button>New Loan</Button>
+        </Link>
       </CardHeader>
       <CardContent>
         <Table>
