@@ -1,9 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
 import { createWalletClient, http, createPublicClient } from "viem";
 import { useAccount, useChains } from "wagmi";
 import { z } from "zod";
 
 import { dstPoolAbi } from "@/lib/abis/dst-pool";
+import { isDerivedAccountEnabledAtom } from "@/lib/settings";
 import { Pool } from "@/lib/types";
 import { deriveAccountFromUid } from "@/lib/utils";
 
@@ -23,6 +25,8 @@ export function useBorrow({ pool }: UseBorrowOptions) {
   const chains = useChains();
   const { address } = useAccount();
 
+  const isDerivedAccountEnabled = useAtomValue(isDerivedAccountEnabledAtom);
+
   return useMutation({
     mutationFn: async ({
       amount,
@@ -34,9 +38,10 @@ export function useBorrow({ pool }: UseBorrowOptions) {
       if (!chain) throw Error("Chain not found");
 
       const derivedAccount = deriveAccountFromUid(address);
+      const account = isDerivedAccountEnabled ? derivedAccount : undefined;
 
       const walletClient = createWalletClient({
-        account: derivedAccount,
+        account,
         chain,
         transport: http(),
       });
@@ -49,7 +54,7 @@ export function useBorrow({ pool }: UseBorrowOptions) {
       const dstPoolAddress = "0x"; // TODO: get dst pool address
 
       const { request } = await publicClient.simulateContract({
-        account: derivedAccount,
+        account,
         address: dstPoolAddress,
         abi: dstPoolAbi,
         functionName: "takeLoan",

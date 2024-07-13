@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
 import { createWalletClient, http, erc20Abi, createPublicClient, decodeEventLog } from "viem";
 import { getTransactionReceipt } from "viem/actions";
 import { useAccount, useChainId, useChains } from "wagmi";
@@ -8,6 +9,7 @@ import { poolFactoryAbi } from "@/lib/abis/pool-factory";
 import { srcPoolAbi } from "@/lib/abis/src-pool";
 import { POOL_FACTORY_ADDRESS } from "@/lib/addresses";
 import { LAYERZERO_ENDPOINT_CONFIG } from "@/lib/layerzero";
+import { isDerivedAccountEnabledAtom } from "@/lib/settings";
 import { ChainId } from "@/lib/types";
 import { deriveAccountFromUid } from "@/lib/utils";
 
@@ -23,14 +25,12 @@ export const depositSchema = z.object({
 
 export type DepositData = z.infer<typeof depositSchema>;
 
-// interface UseDepositOptions {
-//   derivedAccount?: boolean;
-// }
-
 export function useDeposit() {
   const chainId = useChainId();
   const chains = useChains();
   const { address } = useAccount();
+
+  const isDerivedAccountEnabled = useAtomValue(isDerivedAccountEnabledAtom);
 
   return useMutation({
     mutationFn: async ({
@@ -48,9 +48,10 @@ export function useDeposit() {
       if (!srcChain) throw Error("Chain not found");
 
       const derivedAccount = deriveAccountFromUid(address);
+      const account = isDerivedAccountEnabled ? derivedAccount : undefined;
 
       const srcWalletClient = createWalletClient({
-        account: derivedAccount,
+        account,
         chain: srcChain,
         transport: http(),
       });
@@ -61,11 +62,11 @@ export function useDeposit() {
 
       /* Deploy Source Pool */
       const layerZeroSrcEndpoint = LAYERZERO_ENDPOINT_CONFIG[chainId].address;
-      const delegate = derivedAccount.address;
+      const delegate = account?.address || address;
       const expireDate = BigInt(Date.now() / 1000 + 60 * 60 * 24 * daysLocked);
 
       const { request: deploySrcPoolRequest } = await srcPublicClient.simulateContract({
-        account: derivedAccount,
+        account,
         address: POOL_FACTORY_ADDRESS[chainId],
         abi: poolFactoryAbi,
         functionName: "deploySrcPool",
@@ -87,7 +88,7 @@ export function useDeposit() {
       if (!dstChain) throw Error("Chain not found");
 
       const dstWalletClient = createWalletClient({
-        account: derivedAccount,
+        account,
         chain: dstChain,
         transport: http(),
       });
@@ -99,7 +100,7 @@ export function useDeposit() {
       const layerZeroDstEndpoint = LAYERZERO_ENDPOINT_CONFIG[collateralChainId as ChainId].address;
 
       const { request: deployDstPoolRequest } = await dstPublicClient.simulateContract({
-        account: derivedAccount,
+        account,
         address: POOL_FACTORY_ADDRESS[chainId],
         abi: poolFactoryAbi,
         functionName: "deployDstPool",
@@ -122,7 +123,7 @@ export function useDeposit() {
 
       /* Approve */
       const { request: approveRequest } = await srcPublicClient.simulateContract({
-        account: derivedAccount,
+        account,
         address: asset as `0x${string}`,
         abi: erc20Abi,
         functionName: "approve",
@@ -132,7 +133,7 @@ export function useDeposit() {
 
       /* Deposit */
       const { request: depositRequest } = await srcPublicClient.simulateContract({
-        account: derivedAccount,
+        account,
         address: srcPoolAddress,
         abi: srcPoolAbi,
         functionName: "deposit",
