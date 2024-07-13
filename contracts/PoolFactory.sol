@@ -7,8 +7,12 @@ import "./SrcPool.sol";
 contract PoolFactory {
     mapping(address => address[]) private ownerToSrcPools;
     mapping(address => address[]) private ownerToDstPools;
+
     address[] private allSrcPools;
     address[] private allDstPools;
+
+    event DeployedSrcPool(address srcPoolAddress);
+    event DeployedDstPool(address dstPoolAddress);
 
     function deploySrcPool(
         address _endpoint,
@@ -19,7 +23,7 @@ contract PoolFactory {
         uint256 _ltv,
         uint256 _apr,
         uint256 _expiry
-    ) external returns (address) {
+    ) external {
         SrcPool pool = new SrcPool(
             _endpoint,
             _delegate,
@@ -32,7 +36,7 @@ contract PoolFactory {
         );
         ownerToSrcPools[msg.sender].push(address(pool));
         allSrcPools.push(address(pool));
-        return address(pool);
+        emit DeployedSrcPool(address(pool));
     }
 
     function deployDstPool(
@@ -40,7 +44,7 @@ contract PoolFactory {
         address _delegate,
         address _collateralToken,
         uint32 _dstChainId
-    ) external returns (address) {
+    ) external {
         DstPool pool = new DstPool(
             _endpoint,
             _delegate,
@@ -49,7 +53,7 @@ contract PoolFactory {
         );
         ownerToDstPools[msg.sender].push(address(pool));
         allDstPools.push(address(pool));
-        return address(pool);
+        emit DeployedDstPool(address(pool));
     }
 
     /* ========== GETTERS ========== */
