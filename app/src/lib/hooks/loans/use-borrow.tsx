@@ -1,9 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { UseMutationOptions, useMutation } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { createWalletClient, http, createPublicClient, parseUnits } from "viem";
 import { useAccount, useChains } from "wagmi";
 import { z } from "zod";
 
+import { TransactionLinkButton } from "@/components/transaction-link-button";
+import { toast } from "@/components/ui/use-toast";
 import { dstPoolAbi } from "@/lib/abis/dst-pool";
 import { assets } from "@/lib/assets";
 import { isDerivedAccountEnabledAtom } from "@/lib/settings";
@@ -18,11 +20,12 @@ export const getBorrowSchema = (max: number) =>
 
 export type BorrowData = z.infer<ReturnType<typeof getBorrowSchema>>;
 
-interface UseBorrowOptions {
-  pool: Pool;
-}
+type UseBorrowOptions = Omit<
+  UseMutationOptions<string, Error, BorrowData, unknown>,
+  "mutationFn"
+> & { pool: Pool };
 
-export function useBorrow({ pool }: UseBorrowOptions) {
+export function useBorrow({ pool, ...options }: UseBorrowOptions) {
   const chains = useChains();
   const { address } = useAccount();
 
@@ -33,6 +36,7 @@ export function useBorrow({ pool }: UseBorrowOptions) {
       collateralAmount,
       // collateralAsset
     }: BorrowData) => {
+      // return "0xd368d878588a0ff60ce504d22b09c3fc7864ce678b6927d696606062637964b3";
       if (!address) throw Error("Address not found");
 
       const collateralChain = chains.find((chain) => chain.id === pool.collateralChainId);
@@ -77,7 +81,40 @@ export function useBorrow({ pool }: UseBorrowOptions) {
         functionName: "takeLoan",
         args: [parsedCollateralAmount],
       });
-      await walletClient.writeContract(request);
+      return await walletClient.writeContract(request);
+    },
+    ...options,
+    onSuccess(txnHash, variables, context) {
+      const collateralChain = chains.find((chain) => chain.id === pool.collateralChainId);
+      if (!collateralChain) return;
+
+      toast({
+        title: "Borrow Successfull!",
+        description: (
+          <p>
+            Your borrow was successfull.
+            {/* <a
+              href={getExplorerTransactionUrl(chainId, txnHash)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500"
+            >
+              Blockscout
+            </a> */}
+          </p>
+        ),
+        action: <TransactionLinkButton chainId={collateralChain.id as ChainId} txnHash={txnHash} />,
+        variant: "default",
+      });
+      options?.onSuccess?.(txnHash, variables, context);
+    },
+    onError(error, variables, context) {
+      toast({
+        title: "Deposit Failed!",
+        description: error.message,
+        variant: "destructive",
+      });
+      options?.onError?.(error, variables, context);
     },
   });
 }
