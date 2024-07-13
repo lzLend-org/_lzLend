@@ -1,4 +1,4 @@
-import { arbitrumSepolia, baseSepolia, mainnet, sepolia } from "viem/chains";
+import { arbitrumSepolia, baseSepolia, mainnet, scrollSepolia, sepolia } from "viem/chains";
 
 import { Asset, ChainId } from "@/lib/types";
 
@@ -21,4 +21,5 @@ export const assets: Record<ChainId, Asset[]> = {
   [sepolia.id]: [ETH, USDC],
   [arbitrumSepolia.id]: [ETH, USDC],
   [baseSepolia.id]: [ETH, USDC],
+  [scrollSepolia.id]: [ETH, USDC],
 };
