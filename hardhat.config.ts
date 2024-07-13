@@ -5,6 +5,7 @@ import "./scripts/deploy"
 import "./scripts/deployOracles"
 import "./scripts/generate"
 import "./scripts/interact"
+import "hardhat-contract-sizer"
 
 const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
 
@@ -14,22 +15,36 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 100000,
       },
     },
   },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: true,
+  },  
   defaultNetwork: "localhost",
   networks: {
     localhost: {
       url: "http://localhost:8545",
     },
     sepolia: {
-      url: process.env.SEPOLIA_RPC_URL || "https://rpc.ankr.com/eth_sepolia",
+      url: process.env.SEPOLIA_RPC_URL || "https://endpoints.omniatech.io/v1/eth/sepolia/public",
       accounts,
     },
     optimism_sepolia: {
       url: process.env.OPTIMISM_SEPOLIA_RPC_URL || "https://rpc.ankr.com/optimism_sepolia",
       accounts,
+    },
+    arbitrum_sepolia: {
+      url: process.env.ARBITRUM_SEPOLIA_RPC_URL || "https://arbitrum-sepolia.blockpi.network/v1/rpc/public",
+      accounts
+    },
+    zircuit_sepolia: {
+      url: process.env.ZIRCUIT_SEPOLIA_RPC_URL || "https://zircuit1.p2pify.com",
+      accounts
     },
     coston2: {
       url: process.env.COSTON2_RPC_URL || "https://coston2-api.flare.network/ext/C/rpc",
@@ -39,9 +54,13 @@ const config: HardhatUserConfig = {
       url: process.env.MUMBAI_RPC_URL || "https://rpc.ankr.com/polygon_mumbai",
       accounts,
     },
-    fiji: {
+    fuji: {
       url: process.env.FUJI_RPC_URL || "https://avalanche-fuji-c-chain-rpc.publicnode.com",
       accounts,
+    },
+    scroll_sepolia: {
+      url: process.env.SCROLL_SEPOLIA_RPC_URL || "https://sepolia-rpc.scroll.io",
+      accounts
     },
     linea_sepolia: {
       url:

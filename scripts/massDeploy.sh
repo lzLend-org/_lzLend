@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Deploy the tokens
+# hh deploy:custom --contract Token --params '["Token", "TKN"]' --network sepolia
+# hh deploy:custom --contract Token --params '["Token", "TKN"]' --network sepolia
+
+# Deploy the individual oracles
+# hh deploy:custom --contract ChronicleOracle --params '["0x6EDCE65403992e310A62460808c4b910D972f10f", "0xCf12de817eb7b858E15175f42483997DD0Ac9bd5", ["40275", "40231"], ["0x4B5aBFC0Fe78233b97C80b8410681765ED9fC29c", "0xc8A1F9461115EF3C1E84Da6515A88Ea49CA97660"], "0x0Dcc19657007713483A5cA76e6A7bbe5f56EA37d"]' --network scroll_sepolia
+# hh deploy:custom --contract FlareOracle --params '["0x6EDCE65403992e310A62460808c4b910D972f10f", "0xCf12de817eb7b858E15175f42483997DD0Ac9bd5", ["40275", "40231"]]' --network coston2
+# hh deploy:custom --contract PythOracle --params '["0x6EDCE65403992e310A62460808c4b910D972f10f", "0xCf12de817eb7b858E15175f42483997DD0Ac9bd5", ["40275", "40231"], "0x23f0e8FAeE7bbb405E7A7C3d60138FCfd43d7509", ["0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43", "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"]]' --network fuji
+
+# Deploy the master oracle 
+# hh deploy:custom --contract Oracle --params '["0x6EDCE65403992e310A62460808c4b910D972f10f", "0xCf12de817eb7b858E15175f42483997DD0Ac9bd5"]' --network zircuit_sepolia
+# hh deploy:custom --contract Oracle --params '["0x6EDCE65403992e310A62460808c4b910D972f10f", "0xCf12de817eb7b858E15175f42483997DD0Ac9bd5"]' --network arbitrum_sepolia
+
+# deploy the pool factory
+# hh deploy:custom --contract PoolSrcFactory --params '[]' --network zircuit_sepolia
+# hh deploy:custom --contract PoolDstFactory --params '[]' --network zircuit_sepolia
+# hh deploy:custom --contract PoolSrcFactory --params '[]' --network arbitrum_sepolia
+# hh deploy:custom --contract PoolDstFactory --params '[]' --network arbitrum_sepolia
+
+# setPeer to the different apps
+# chronicle -> oracle (A)
+# chronicle -> oracle (b)
+# oracle (A) -> chronicle
+# oracle (A) -> flare
+# oracle (A) -> pyth

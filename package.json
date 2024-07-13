@@ -10,6 +10,7 @@
     "@pythnetwork/pyth-sdk-solidity": "^3.1.0",
     "dotenv": "^16.4.5",
     "hardhat": "^2.22.6",
+    "hardhat-contract-sizer": "^2.10.0",
     "lz-evm-protocol-v2,": "link:@layerzerolabs/lz-evm-protocol-v2,",
     "prettier": "^3.3.2"
   }
