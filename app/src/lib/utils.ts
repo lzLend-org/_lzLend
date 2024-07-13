@@ -1,5 +1,10 @@
 import { type ClassValue, clsx } from "clsx";
+import CryptoJS from "crypto-js";
 import { twMerge } from "tailwind-merge";
+import { toHex } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+
+toHex(new Uint8Array([1, 69, 420]));
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -43,4 +48,13 @@ export function getAddressExplorerLink(address: string) {
 
 export function getDaysDifference(timestamp: bigint) {
   return Math.round((Number(timestamp) - Date.now()) / (1000 * 60 * 60 * 24));
+}
+
+export function deriveAccountFromUid(uid: string) {
+  const hashedString = CryptoJS.SHA256(uid).toString();
+
+  const buffer = Buffer.from(hashedString, "hex");
+  const privateKey = toHex(buffer);
+
+  return privateKeyToAccount(privateKey);
 }

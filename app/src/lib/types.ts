@@ -23,15 +23,16 @@ export interface Pool {
 }
 
 export interface Loan {
-  chainId: ChainId;
-  asset: Asset;
   amount: bigint;
-  collateralChainId: ChainId;
-  collateralAsset: Asset;
   collateralAmount: bigint;
-  apr: bigint;
   startDate: bigint;
   owner: `0x${string}`;
+  pool: Pool;
+  // chainId: ChainId;
+  // asset: Asset;
+  // collateralChainId: ChainId;
+  // collateralAsset: Asset;
+  // apr: bigint;
 }
 
 export type ChainId = Exclude<ChainIdParameter<typeof config>["chainId"], undefined>;

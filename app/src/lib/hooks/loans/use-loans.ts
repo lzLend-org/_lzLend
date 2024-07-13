@@ -39,15 +39,16 @@ export function useLoans(params?: UseLoansOptions) {
         if (!result.result) return null;
 
         return {
-          chainId: pool.chainId,
-          asset: pool.asset,
           amount: result.result[0],
-          collateralChainId: pool.collateralChainId,
-          collateralAsset: pool.collateralAsset,
           collateralAmount: result.result[1],
-          apr: pool.apr,
           startDate: result.result[2],
           owner: result.result[3],
+          pool,
+          // chainId: pool.chainId,
+          // asset: pool.asset,
+          // collateralChainId: pool.collateralChainId,
+          // collateralAsset: pool.collateralAsset,
+          // apr: pool.apr,
         };
       });
 

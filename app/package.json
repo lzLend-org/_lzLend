@@ -25,6 +25,7 @@
     "@wagmi/core": "^2.11.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "crypto-js": "^4.2.0",
     "lucide-react": "^0.381.0",
     "next": "14.2.3",
     "next-themes": "^0.3.0",
@@ -39,6 +40,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-blockies": "^1.4.4",

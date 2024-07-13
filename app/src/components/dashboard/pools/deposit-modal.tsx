@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useChainId } from "wagmi";
 import { useChains } from "wagmi";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { BaseDialogProps, Dialog, DialogContent } from "@/components/ui/dialog";
@@ -24,28 +23,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { assets } from "@/lib/assets";
+import { DepositData, depositSchema, useDeposit } from "@/lib/hooks/pools/use-deposit";
+import { ChainId } from "@/lib/types";
 
-const createDepositSchema = z.object({
-  asset: z.string().min(1),
-  amount: z.number().gt(0),
-  interestRate: z.number().gt(0),
-  daysLocked: z.number().gt(0),
-  collateralChainId: z.number().gt(0),
-  ltv: z.number().gt(0).max(1),
-});
-
-type CreateDepositData = z.infer<typeof createDepositSchema>;
-
-export function NewDepositModal({ open, onOpenChange }: BaseDialogProps) {
+export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
   const chainId = useChainId();
   const chains = useChains();
   const chainAssets = assets[chainId];
 
-  const form = useForm<CreateDepositData>({
-    resolver: zodResolver(createDepositSchema),
+  const form = useForm<DepositData>({
+    resolver: zodResolver(depositSchema),
     defaultValues: {
       asset: chainAssets[0].address,
       amount: 0,
+      ltv: 0,
       interestRate: 0,
       daysLocked: 30,
       collateralChainId: chains[0].id,
@@ -56,10 +47,15 @@ export function NewDepositModal({ open, onOpenChange }: BaseDialogProps) {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = form;
+  const collateralChainId = watch("collateralChainId");
+  const collateralChainAssets = assets[collateralChainId as ChainId];
+
+  const { mutate: deposit } = useDeposit();
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
+    deposit(data);
   });
 
   return (
@@ -141,7 +137,7 @@ export function NewDepositModal({ open, onOpenChange }: BaseDialogProps) {
 
             <div>
               <Label className="mb-2 block" htmlFor="name">
-                LTV
+                LTV (%)
               </Label>
               <Input
                 id="name"
@@ -196,6 +192,31 @@ export function NewDepositModal({ open, onOpenChange }: BaseDialogProps) {
                       {chains.map((chain) => (
                         <SelectItem key={chain.id} value={chain.id.toString()}>
                           {chain.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="collateralAsset"
+              render={({ field }) => (
+                <FormItem className="space-y-0">
+                  <FormLabel className="mb-2 block">Collateral Asset</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an asset" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {collateralChainAssets.map((asset) => (
+                        <SelectItem key={asset.symbol} value={asset.address}>
+                          {asset.name} ({asset.symbol})
                         </SelectItem>
                       ))}
                     </SelectContent>

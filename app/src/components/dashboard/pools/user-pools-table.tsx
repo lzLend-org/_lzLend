@@ -5,7 +5,7 @@ import { formatEther } from "viem";
 import { mainnet } from "viem/chains";
 import { useAccount, useChains } from "wagmi";
 
-import { NewDepositModal } from "@/components/dashboard/pools/new-deposit-modal";
+import { DepositModal } from "@/components/dashboard/pools/deposit-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -101,7 +101,7 @@ export function UserPoolsTable() {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Active Deposits</CardTitle>
         <Button onClick={() => setIsModalOpen(true)}>New Deposit</Button>
-        <NewDepositModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+        <DepositModal open={isModalOpen} onOpenChange={setIsModalOpen} />
       </CardHeader>
       <CardContent>
         <Table>

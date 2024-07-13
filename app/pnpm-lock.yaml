@@ -53,6 +53,9 @@ dependencies:
   clsx:
     specifier: ^2.1.1
     version: 2.1.1
+  crypto-js:
+    specifier: ^4.2.0
+    version: 4.2.0
   lucide-react:
     specifier: ^0.381.0
     version: 0.381.0(react@18.0.0)
@@ -91,6 +94,9 @@ dependencies:
     version: 3.23.8
 
 devDependencies:
+  '@types/crypto-js':
+    specifier: ^4.2.2
+    version: 4.2.2
   '@types/node':
     specifier: ^20
     version: 20.0.0
@@ -4445,6 +4451,10 @@ packages:
       '@types/node': 20.0.0
     dev: false
 
+  /@types/crypto-js@4.2.2:
+    resolution: {integrity: sha512-sDOLlVbHhXpAUAL0YHDUUwDZf3iN4Bwi4W6a0W0b+QcAezUbRtH4FVb+9J4h+XFPW7l/gQ9F8qC7P+Ec4k8QVQ==}
+    dev: true
+
   /@types/debug@4.1.12:
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
     dependencies:
@@ -6400,6 +6410,10 @@ packages:
     peerDependenciesMeta:
       uWebSockets.js:
         optional: true
+    dev: false
+
+  /crypto-js@4.2.0:
+    resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
     dev: false
 
   /css-what@6.1.0:

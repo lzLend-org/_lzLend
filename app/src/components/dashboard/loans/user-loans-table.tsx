@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { formatEther } from "viem";
-import { mainnet } from "viem/chains";
 import { useChains } from "wagmi";
 
-import { RepayLoanModal } from "@/components/dashboard/loans/repay-loan-modal";
+import { RepayModal } from "@/components/dashboard/loans/repay-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -17,66 +16,8 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { ETH } from "@/lib/assets";
+import { loans } from "@/lib/data";
 import { Loan } from "@/lib/types";
-
-const loans: Loan[] = [
-  {
-    chainId: mainnet.id,
-    asset: ETH,
-    amount: BigInt(100000000000000),
-    collateralChainId: mainnet.id,
-    collateralAsset: ETH,
-    collateralAmount: BigInt(80000000000000),
-    apr: BigInt(2),
-    startDate: BigInt(Date.now()),
-    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-  },
-  {
-    chainId: mainnet.id,
-    asset: ETH,
-    amount: BigInt(100000000000000),
-    collateralChainId: mainnet.id,
-    collateralAsset: ETH,
-    collateralAmount: BigInt(80000000000000),
-    apr: BigInt(2),
-    startDate: BigInt(Date.now()),
-    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-  },
-  {
-    chainId: mainnet.id,
-    asset: ETH,
-    amount: BigInt(100000000000000),
-    collateralChainId: mainnet.id,
-    collateralAsset: ETH,
-    collateralAmount: BigInt(80000000000000),
-    apr: BigInt(2),
-    startDate: BigInt(Date.now()),
-    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-  },
-  {
-    chainId: mainnet.id,
-    asset: ETH,
-    amount: BigInt(100000000000000),
-    collateralChainId: mainnet.id,
-    collateralAsset: ETH,
-    collateralAmount: BigInt(80000000000000),
-    apr: BigInt(2),
-    startDate: BigInt(Date.now()),
-    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-  },
-  {
-    chainId: mainnet.id,
-    asset: ETH,
-    amount: BigInt(100000000000000),
-    collateralChainId: mainnet.id,
-    collateralAsset: ETH,
-    collateralAmount: BigInt(80000000000000),
-    apr: BigInt(2),
-    startDate: BigInt(Date.now()),
-    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-  },
-];
 
 export function UserLoansTable() {
   const chains = useChains();
@@ -109,14 +50,16 @@ export function UserLoansTable() {
           <TableBody>
             {loans.map((loan, index) => (
               <TableRow key={index}>
-                <TableCell>{chains.find((chain) => chain.id === loan.chainId)?.name}</TableCell>
-                <TableCell>{loan.asset.symbol}</TableCell>
-                <TableCell>{formatEther(loan.amount)}</TableCell>
-                <TableCell>{formatEther(loan.apr)}</TableCell>
                 <TableCell>
-                  {chains.find((chain) => chain.id === loan.collateralChainId)?.name}
+                  {chains.find((chain) => chain.id === loan.pool.chainId)?.name}
                 </TableCell>
-                <TableCell>{loan.collateralAsset.symbol}</TableCell>
+                <TableCell>{loan.pool.asset.symbol}</TableCell>
+                <TableCell>{formatEther(loan.amount)}</TableCell>
+                <TableCell>{formatEther(loan.pool.apr)}</TableCell>
+                <TableCell>
+                  {chains.find((chain) => chain.id === loan.pool.collateralChainId)?.name}
+                </TableCell>
+                <TableCell>{loan.pool.collateralAsset.symbol}</TableCell>
                 <TableCell>{formatEther(loan.collateralAmount)}</TableCell>
                 <TableCell>
                   <Button
@@ -135,7 +78,7 @@ export function UserLoansTable() {
           </TableBody>
         </Table>
         {selectedLoan && (
-          <RepayLoanModal loan={selectedLoan} onOpenChange={setIsModalOpen} open={isModalOpen} />
+          <RepayModal loan={selectedLoan} onOpenChange={setIsModalOpen} open={isModalOpen} />
         )}
       </CardContent>
     </Card>

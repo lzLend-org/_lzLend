@@ -1,40 +1,41 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import { useForm } from "react-hook-form";
+import { formatEther } from "viem";
+import { useChains } from "wagmi";
 
 import { Button } from "@/components/ui/button";
 import { BaseDialogProps, Dialog, DialogContent } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+// import { Input } from "@/components/ui/input";
+// import { Label } from "@/components/ui/label";
+// import { Separator } from "@/components/ui/separator";
+import { useRepay } from "@/lib/hooks/loans/use-repay";
 import { Loan } from "@/lib/types";
 
-const getRepayLoanSchema = (max: number) =>
-  z.object({
-    amount: z.number().positive().lte(max),
-  });
-
-type RepayLoanData = z.infer<ReturnType<typeof getRepayLoanSchema>>;
-
-interface RepayLoanModalProps extends BaseDialogProps {
+interface RepayModalProps extends BaseDialogProps {
   loan: Loan;
 }
 
-export function RepayLoanModal({ loan, open, onOpenChange }: RepayLoanModalProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<RepayLoanData>({
-    resolver: zodResolver(getRepayLoanSchema(loan.amount)),
-    defaultValues: {
-      amount: 0,
-    },
-  });
+export function RepayModal({ loan, open, onOpenChange }: RepayModalProps) {
+  const chains = useChains();
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   formState: { errors },
+  //   reset,
+  // } = useForm<RepayLoanData>({
+  //   resolver: zodResolver(getRepayLoanSchema(Number(loan.amount))),
+  //   defaultValues: {
+  //     amount: 0,
+  //   },
+  // });
+
+  // const onSubmit = handleSubmit((data) => {
+  //   console.log(data);
+  // });
+
+  const { mutate: repay } = useRepay({
+    loan,
   });
 
   return (
@@ -42,33 +43,35 @@ export function RepayLoanModal({ loan, open, onOpenChange }: RepayLoanModalProps
       open={open}
       onOpenChange={() => {
         onOpenChange(false);
-        reset();
+        // reset();
       }}
       modal={true}
     >
       <DialogContent className="flex max-h-[90vh] max-w-md flex-col px-6">
         <h2 className="text-xl font-semibold">Repay</h2>
 
-        <form onSubmit={onSubmit} className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div className="text-muted-foreground">Chain</div>
-            <div className="font-medium">{loan.chain}</div>
+            <div className="font-medium">
+              {chains.find((chain) => chain.id === loan.pool.chainId)?.name}
+            </div>
           </div>
           <div className="flex items-center justify-between">
             <div className="text-muted-foreground">Asset</div>
-            <div className="font-medium">{loan.asset.symbol}</div>
+            <div className="font-medium">{loan.pool.asset.symbol}</div>
           </div>
           <div className="flex items-center justify-between">
             <div className="text-muted-foreground">Amount</div>
-            <div className="font-medium">{loan.amount}</div>
+            <div className="font-medium">{formatEther(loan.amount)}</div>
           </div>
           <div className="flex items-center justify-between">
             <div className="text-muted-foreground">Interest Rate</div>
-            <div className="font-medium">{loan.interestRate}</div>
+            <div className="font-medium">{formatEther(loan.pool.apr)}</div>
           </div>
-          <Separator className="my-3" />
+          {/* <Separator className="my-3" /> */}
 
-          <div>
+          {/* <div>
             <Label className="mb-2 block" htmlFor="name">
               Amount
             </Label>
@@ -86,7 +89,7 @@ export function RepayLoanModal({ loan, open, onOpenChange }: RepayLoanModalProps
             {errors?.amount && (
               <p className="px-1 text-xs text-destructive">{errors.amount.message}</p>
             )}
-          </div>
+          </div> */}
 
           <div className="flex items-center justify-end gap-2">
             <Button
@@ -98,13 +101,14 @@ export function RepayLoanModal({ loan, open, onOpenChange }: RepayLoanModalProps
               Cancel
             </Button>
             <Button
-            // disabled={isPending}
-            // loading={isPending}
+              // disabled={isPending}
+              // loading={isPending}
+              onClick={() => repay()}
             >
-              Borrow
+              Repay
             </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

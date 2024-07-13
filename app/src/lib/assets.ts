@@ -1,6 +1,6 @@
 import { mainnet, sepolia } from "viem/chains";
 
-import { Asset } from "@/lib/types";
+import { Asset, ChainId } from "@/lib/types";
 
 export const ETH: Asset = {
   name: "Ethereum",
@@ -16,7 +16,7 @@ export const USDC: Asset = {
   decimals: 6,
 };
 
-export const assets: Record<number, Asset[]> = {
+export const assets: Record<ChainId, Asset[]> = {
   [mainnet.id]: [ETH, USDC],
   [sepolia.id]: [ETH, USDC],
 };

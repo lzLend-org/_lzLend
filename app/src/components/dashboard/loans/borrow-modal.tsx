@@ -1,55 +1,33 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { formatEther } from "viem";
-import { useChainId } from "wagmi";
+// import { useChainId } from "wagmi";
 import { useChains } from "wagmi";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { BaseDialogProps, Dialog, DialogContent } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { assets } from "@/lib/assets";
+// import { assets } from "@/lib/assets";
+import { BorrowData, getBorrowSchema, useBorrow } from "@/lib/hooks/loans/use-borrow";
 import { Pool } from "@/lib/types";
 
-const getCreateLoanSchema = (max: number) =>
-  z.object({
-    amount: z.number().positive().lte(max),
-    collateralAsset: z.string().min(1),
-  });
-
-type CreateLoanData = z.infer<ReturnType<typeof getCreateLoanSchema>>;
-
-interface NewLoanModalProps extends BaseDialogProps {
+interface BorrowModalProps extends BaseDialogProps {
   pool: Pool;
 }
 
-export function NewLoanModal({ pool, open, onOpenChange }: NewLoanModalProps) {
-  const chainId = useChainId();
+export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
+  // const chainId = useChainId();
   const chains = useChains();
-  const chainAssets = assets[chainId];
+  // const chainAssets = assets[chainId];
 
-  const form = useForm<CreateLoanData>({
-    resolver: zodResolver(getCreateLoanSchema(Number(pool.amount))),
+  const form = useForm<BorrowData>({
+    resolver: zodResolver(getBorrowSchema(Number(pool.amount))),
     defaultValues: {
       amount: 0,
-      collateralAsset: chainAssets[0].address,
+      // collateralAsset: chainAssets[0].address,
     },
   });
   const {
@@ -59,8 +37,12 @@ export function NewLoanModal({ pool, open, onOpenChange }: NewLoanModalProps) {
     reset,
   } = form;
 
+  const { mutate: borrow } = useBorrow({
+    pool,
+  });
+
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
+    borrow(data);
   });
 
   return (
@@ -79,7 +61,9 @@ export function NewLoanModal({ pool, open, onOpenChange }: NewLoanModalProps) {
           <form onSubmit={onSubmit} className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="text-muted-foreground">Chain</div>
-              <div className="font-medium">{pool.chain}</div>
+              <div className="font-medium">
+                {chains.find((chain) => chain.id === pool.chainId)?.name}
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <div className="text-muted-foreground">Asset</div>
@@ -121,30 +105,30 @@ export function NewLoanModal({ pool, open, onOpenChange }: NewLoanModalProps) {
               )}
             </div>
 
-            <FormField
-              control={form.control}
-              name="collateralAsset"
-              render={({ field }) => (
-                <FormItem className="space-y-0">
-                  <FormLabel className="mb-2 block">Collateral Asset</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an asset" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {chainAssets.map((asset) => (
-                        <SelectItem key={asset.symbol} value={asset.address}>
-                          {asset.name} ({asset.symbol})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* <FormField
+            control={form.control}
+            name="collateralAsset"
+            render={({ field }) => (
+              <FormItem className="space-y-0">
+                <FormLabel className="mb-2 block">Collateral Asset</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an asset" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {chainAssets.map((asset) => (
+                      <SelectItem key={asset.symbol} value={asset.address}>
+                        {asset.name} ({asset.symbol})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          /> */}
 
             <div className="flex items-center justify-end gap-2">
               <Button

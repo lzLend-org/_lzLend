@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import { formatEther } from "viem";
-import { mainnet } from "viem/chains";
 import { useChains } from "wagmi";
 
 import { Address } from "@/components/address";
-import { NewLoanModal } from "@/components/dashboard/loans/new-loan-modal";
+import { BorrowModal } from "@/components/dashboard/loans/borrow-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -17,73 +16,10 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { ETH, USDC } from "@/lib/assets";
+import { pools } from "@/lib/data";
 import { usePools } from "@/lib/hooks/pools/use-pools";
 import { Pool } from "@/lib/types";
 import { getDaysDifference } from "@/lib/utils";
-
-const pools: Pool[] = [
-  {
-    chainId: mainnet.id,
-    asset: ETH,
-    amount: BigInt(100000000000000),
-    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    apr: BigInt(2),
-    expireDate: BigInt(Date.now() + 1000 * 60 * 60 * 24 * 30),
-    collateralChainId: mainnet.id,
-    collateralAsset: USDC,
-    ltv: BigInt(5),
-  },
-  {
-    chainId: mainnet.id,
-    asset: USDC,
-    amount: BigInt(100000000000000),
-    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    apr: BigInt(2),
-    expireDate: BigInt(Date.now() + 1000 * 60 * 60 * 24 * 30),
-    collateralChainId: mainnet.id,
-    collateralAsset: USDC,
-    ltv: BigInt(5),
-  },
-  {
-    chainId: mainnet.id,
-    asset: USDC,
-    amount: BigInt(100000000000000),
-    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    apr: BigInt(2),
-    expireDate: BigInt(Date.now() + 1000 * 60 * 60 * 24 * 30),
-    collateralChainId: mainnet.id,
-    collateralAsset: USDC,
-    ltv: BigInt(5),
-  },
-  {
-    chainId: mainnet.id,
-    asset: USDC,
-    amount: BigInt(100000000000000),
-    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    apr: BigInt(2),
-    expireDate: BigInt(Date.now() + 1000 * 60 * 60 * 24 * 30),
-    collateralChainId: mainnet.id,
-    collateralAsset: USDC,
-    ltv: BigInt(5),
-  },
-  {
-    chainId: mainnet.id,
-    asset: USDC,
-    amount: BigInt(100000000000000),
-    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    apr: BigInt(2),
-    expireDate: BigInt(Date.now() + 1000 * 60 * 60 * 24 * 30),
-    collateralChainId: mainnet.id,
-    collateralAsset: USDC,
-    ltv: BigInt(5),
-  },
-];
 
 export function PoolsTable() {
   const chains = useChains();
@@ -146,7 +82,7 @@ export function PoolsTable() {
           </TableBody>
         </Table>
         {selectedPool && (
-          <NewLoanModal pool={selectedPool} onOpenChange={setIsModalOpen} open={isModalOpen} />
+          <BorrowModal pool={selectedPool} onOpenChange={setIsModalOpen} open={isModalOpen} />
         )}
       </CardContent>
     </Card>
