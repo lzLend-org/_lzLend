@@ -1,3 +1,7 @@
+import { ChainIdParameter } from "@wagmi/core/internal";
+
+import { config } from "@/lib/wagmi";
+
 export interface Asset {
   name: string;
   symbol: string;
@@ -6,7 +10,7 @@ export interface Asset {
 }
 
 export interface Deposit {
-  chain: string;
+  chain: ChainId;
   asset: Asset;
   amount: number;
   owner: `0x${string}`;
@@ -25,3 +29,5 @@ export interface Loan {
   collateralAmount: string;
   interestRate: string;
 }
+
+export type ChainId = Exclude<ChainIdParameter<typeof config>["chainId"], undefined>;

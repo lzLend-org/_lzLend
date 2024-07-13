@@ -21,7 +21,7 @@ import { getDaysDifference } from "@/lib/utils";
 
 const deposits: Deposit[] = [
   {
-    chain: "Ethereum",
+    chain: mainnet.id,
     asset: ETH,
     amount: 1.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -31,7 +31,7 @@ const deposits: Deposit[] = [
     ltv: 0.5,
   },
   {
-    chain: "Bitcoin",
+    chain: mainnet.id,
     asset: USDC,
     amount: 0.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -41,7 +41,7 @@ const deposits: Deposit[] = [
     ltv: 0.5,
   },
   {
-    chain: "Ethereum",
+    chain: mainnet.id,
     asset: USDC,
     amount: 2.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -51,7 +51,7 @@ const deposits: Deposit[] = [
     ltv: 0.5,
   },
   {
-    chain: "Bitcoin",
+    chain: mainnet.id,
     asset: USDC,
     amount: 0.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -61,7 +61,7 @@ const deposits: Deposit[] = [
     ltv: 0.5,
   },
   {
-    chain: "Ethereum",
+    chain: mainnet.id,
     asset: USDC,
     amount: 5000,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -103,7 +103,7 @@ export function DepositsTable() {
               <TableRow key={index}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <span>{deposit.chain}</span>
+                    <span>{chains.find((chain) => chain.id === deposit.chain)?.name}</span>
                   </div>
                 </TableCell>
                 <TableCell>

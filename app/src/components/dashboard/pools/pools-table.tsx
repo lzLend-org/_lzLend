@@ -17,12 +17,13 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { ETH, USDC } from "@/lib/assets";
+import { usePools } from "@/lib/hooks/use-pools";
 import { Deposit } from "@/lib/types";
 import { getDaysDifference } from "@/lib/utils";
 
 const pools: Deposit[] = [
   {
-    chain: "Ethereum",
+    chain: mainnet.id,
     asset: USDC,
     amount: 1.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -32,7 +33,7 @@ const pools: Deposit[] = [
     ltv: 0.5,
   },
   {
-    chain: "Bitcoin",
+    chain: mainnet.id,
     asset: USDC,
     amount: 0.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -42,7 +43,7 @@ const pools: Deposit[] = [
     ltv: 0.5,
   },
   {
-    chain: "Ethereum",
+    chain: mainnet.id,
     asset: ETH,
     amount: 2.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -52,7 +53,7 @@ const pools: Deposit[] = [
     ltv: 0.5,
   },
   {
-    chain: "Bitcoin",
+    chain: mainnet.id,
     asset: ETH,
     amount: 0.5,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -62,7 +63,7 @@ const pools: Deposit[] = [
     ltv: 0.5,
   },
   {
-    chain: "Ethereum",
+    chain: mainnet.id,
     asset: ETH,
     amount: 5000,
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -78,6 +79,9 @@ export function PoolsTable() {
 
   const [selectedPool, setSelectedPool] = useState<Deposit | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { data } = usePools();
+  console.log("Pools: ", data);
 
   return (
     <Card>
