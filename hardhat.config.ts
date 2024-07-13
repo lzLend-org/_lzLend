@@ -2,7 +2,9 @@ import "@nomicfoundation/hardhat-toolbox-viem"
 import "dotenv/config"
 import { HardhatUserConfig } from "hardhat/config"
 import "./scripts/deploy"
+import "./scripts/deployOracles"
 import "./scripts/generate"
+import "./scripts/interact"
 
 const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
 
@@ -35,6 +37,10 @@ const config: HardhatUserConfig = {
     },
     mumbai: {
       url: process.env.MUMBAI_RPC_URL || "https://rpc.ankr.com/polygon_mumbai",
+      accounts,
+    },
+    fiji: {
+      url: process.env.FUJI_RPC_URL || "https://avalanche-fuji-c-chain-rpc.publicnode.com",
       accounts,
     },
     linea_sepolia: {

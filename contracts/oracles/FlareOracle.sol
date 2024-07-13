@@ -28,7 +28,7 @@ contract FlareOracle is OApp, OAppOptionsType3 {
         address _endpoint,
         address _owner,
         uint32[] memory _dstIds
-    ) OApp(_endpoint, _owner) Ownable(msg.sender) {
+    ) OApp(_endpoint, _owner) Ownable(_owner) {
         contractRegistry = IFlareContractRegistry(
             0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019
         );
@@ -37,10 +37,6 @@ contract FlareOracle is OApp, OAppOptionsType3 {
         );
         dstIds = _dstIds;
     }
-
-    /**
-     * Get the current value of the feeds.
-     */
 
     function read() public view returns (uint256[] memory _feedValues) {
         (uint256[] memory feedValues, int8[] memory decimals, ) = ftsoV2
