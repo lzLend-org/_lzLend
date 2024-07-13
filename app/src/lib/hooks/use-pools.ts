@@ -19,7 +19,11 @@ const allPoolFactories = Object.entries(POOL_FACTORY_ADDRESS).map(
     }) as const,
 );
 
-export function usePools() {
+interface UsePoolsParams {
+  owner?: `0x${string}`;
+}
+
+export function usePools({ owner }: UsePoolsParams) {
   const chains = useChains();
 
   return useQuery<Deposit[]>({
@@ -30,7 +34,8 @@ export function usePools() {
           address: poolFactory.address,
           abi: poolFactory.abi,
           chainId: poolFactory.chainId,
-          functionName: "getAllSrcPools",
+          functionName: owner ? "getAllSrcPools" : "getSrcPoolsByOwner",
+          args: owner ? [owner] : undefined,
         })),
       });
 
