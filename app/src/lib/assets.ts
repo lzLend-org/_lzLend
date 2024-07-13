@@ -16,7 +16,7 @@ export const USDC: Asset = {
   decimals: 6,
 };
 
-export const assets: Record<string, Asset[]> = {
+export const assets: Record<number, Asset[]> = {
   [mainnet.id]: [ETH, USDC],
   [sepolia.id]: [ETH, USDC],
 };

@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { formatEther } from "viem";
+import { mainnet } from "viem/chains";
+import { useChains } from "wagmi";
 
 import { RepayLoanModal } from "@/components/dashboard/loans/repay-loan-modal";
 import { Button } from "@/components/ui/button";
@@ -14,58 +17,70 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { ETH, USDC } from "@/lib/assets";
+import { ETH } from "@/lib/assets";
 import { Loan } from "@/lib/types";
 
 const loans: Loan[] = [
   {
-    chain: "Ethereum",
+    chainId: mainnet.id,
     asset: ETH,
-    amount: 1.5,
-    collateralChain: "Ethereum",
-    collateralAsset: "ETH",
-    collateralAmount: "1.5",
-    interestRate: "2%",
+    amount: BigInt(100000000000000),
+    collateralChainId: mainnet.id,
+    collateralAsset: ETH,
+    collateralAmount: BigInt(80000000000000),
+    apr: BigInt(2),
+    startDate: BigInt(Date.now()),
+    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
   },
   {
-    chain: "Bitcoin",
-    asset: USDC,
-    amount: 0.5,
-    collateralChain: "Ethereum",
-    collateralAsset: "ETH",
-    collateralAmount: "1.5",
-    interestRate: "3%",
+    chainId: mainnet.id,
+    asset: ETH,
+    amount: BigInt(100000000000000),
+    collateralChainId: mainnet.id,
+    collateralAsset: ETH,
+    collateralAmount: BigInt(80000000000000),
+    apr: BigInt(2),
+    startDate: BigInt(Date.now()),
+    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
   },
   {
-    chain: "Ethereum",
-    asset: USDC,
-    amount: 2.5,
-    collateralChain: "Ethereum",
-    collateralAsset: "ETH",
-    collateralAmount: "1.5",
-    interestRate: "5.2%",
+    chainId: mainnet.id,
+    asset: ETH,
+    amount: BigInt(100000000000000),
+    collateralChainId: mainnet.id,
+    collateralAsset: ETH,
+    collateralAmount: BigInt(80000000000000),
+    apr: BigInt(2),
+    startDate: BigInt(Date.now()),
+    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
   },
   {
-    chain: "Bitcoin",
-    asset: USDC,
-    amount: 0.5,
-    collateralChain: "Ethereum",
-    collateralAsset: "ETH",
-    collateralAmount: "1.5",
-    interestRate: "4.8%",
+    chainId: mainnet.id,
+    asset: ETH,
+    amount: BigInt(100000000000000),
+    collateralChainId: mainnet.id,
+    collateralAsset: ETH,
+    collateralAmount: BigInt(80000000000000),
+    apr: BigInt(2),
+    startDate: BigInt(Date.now()),
+    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
   },
   {
-    chain: "Ethereum",
-    asset: USDC,
-    amount: 5000,
-    collateralChain: "Ethereum",
-    collateralAsset: "ETH",
-    collateralAmount: "1.5",
-    interestRate: "3.2%",
+    chainId: mainnet.id,
+    asset: ETH,
+    amount: BigInt(100000000000000),
+    collateralChainId: mainnet.id,
+    collateralAsset: ETH,
+    collateralAmount: BigInt(80000000000000),
+    apr: BigInt(2),
+    startDate: BigInt(Date.now()),
+    owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
   },
 ];
 
-export function LoansTable() {
+export function UserLoansTable() {
+  const chains = useChains();
+
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -94,29 +109,15 @@ export function LoansTable() {
           <TableBody>
             {loans.map((loan, index) => (
               <TableRow key={index}>
+                <TableCell>{chains.find((chain) => chain.id === loan.chainId)?.name}</TableCell>
+                <TableCell>{loan.asset.symbol}</TableCell>
+                <TableCell>{formatEther(loan.amount)}</TableCell>
+                <TableCell>{formatEther(loan.apr)}</TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span>{loan.chain}</span>
-                  </div>
+                  {chains.find((chain) => chain.id === loan.collateralChainId)?.name}
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span>{loan.asset.symbol}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{loan.amount}</TableCell>
-                <TableCell>{loan.interestRate}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span>{loan.collateralChain}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span>{loan.collateralAsset}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{loan.collateralAmount}</TableCell>
+                <TableCell>{loan.collateralAsset.symbol}</TableCell>
+                <TableCell>{formatEther(loan.collateralAmount)}</TableCell>
                 <TableCell>
                   <Button
                     size="sm"

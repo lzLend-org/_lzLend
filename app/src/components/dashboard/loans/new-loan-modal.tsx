@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { formatEther } from "viem";
 import { useChainId } from "wagmi";
 import { useChains } from "wagmi";
 import { z } from "zod";
@@ -25,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { assets } from "@/lib/assets";
-import { Deposit } from "@/lib/types";
+import { Pool } from "@/lib/types";
 
 const getCreateLoanSchema = (max: number) =>
   z.object({
@@ -36,7 +37,7 @@ const getCreateLoanSchema = (max: number) =>
 type CreateLoanData = z.infer<ReturnType<typeof getCreateLoanSchema>>;
 
 interface NewLoanModalProps extends BaseDialogProps {
-  pool: Deposit;
+  pool: Pool;
 }
 
 export function NewLoanModal({ pool, open, onOpenChange }: NewLoanModalProps) {
@@ -45,7 +46,7 @@ export function NewLoanModal({ pool, open, onOpenChange }: NewLoanModalProps) {
   const chainAssets = assets[chainId];
 
   const form = useForm<CreateLoanData>({
-    resolver: zodResolver(getCreateLoanSchema(pool.amount)),
+    resolver: zodResolver(getCreateLoanSchema(Number(pool.amount))),
     defaultValues: {
       amount: 0,
       collateralAsset: chainAssets[0].address,
@@ -86,7 +87,7 @@ export function NewLoanModal({ pool, open, onOpenChange }: NewLoanModalProps) {
             </div>
             <div className="flex items-center justify-between">
               <div className="text-muted-foreground">Interest Rate</div>
-              <div className="font-medium">{pool.interestRate}</div>
+              <div className="font-medium">{formatEther(pool.apr)}</div>
             </div>
             <div className="flex items-center justify-between">
               <div className="text-muted-foreground">Collateral Chain</div>
