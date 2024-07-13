@@ -4,6 +4,7 @@ import { poolFactoryAbi } from "@/lib/abis/pool-factory";
 import { srcPoolAbi } from "@/lib/abis/src-pool";
 import { POOL_FACTORY_ADDRESS } from "@/lib/addresses";
 import { USDC, assets } from "@/lib/assets";
+import { LAYERZERO_ENDPOINT_CONFIG } from "@/lib/layerzero";
 import { ChainId, Pool } from "@/lib/types";
 import { config } from "@/lib/wagmi";
 
@@ -72,6 +73,12 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
     const collateralAsset =
       assets[chainId].find((asset) => asset.address === poolMetadata.collateralToken) || USDC;
 
+    const entry = Object.entries(LAYERZERO_ENDPOINT_CONFIG).find(
+      ([, config]) => config.id === poolMetadata.dstChainId,
+    );
+    if (!entry) return null;
+    const collateralChainId = parseInt(entry[0]) as ChainId;
+
     return {
       chainId,
       asset,
@@ -80,7 +87,7 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
       address: poolAddresses[index].address,
       apr: poolMetadata.apr,
       expireDate: poolMetadata.expiry,
-      collateralChainId: poolMetadata.dstChainId as ChainId,
+      collateralChainId,
       collateralAsset,
       ltv: poolMetadata.ltv,
     };

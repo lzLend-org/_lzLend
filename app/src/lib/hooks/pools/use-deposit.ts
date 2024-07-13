@@ -7,7 +7,7 @@ import { z } from "zod";
 import { poolFactoryAbi } from "@/lib/abis/pool-factory";
 import { srcPoolAbi } from "@/lib/abis/src-pool";
 import { POOL_FACTORY_ADDRESS } from "@/lib/addresses";
-import { LAYERZERO_ENDPOINT_ADDRESS } from "@/lib/layerzero";
+import { LAYERZERO_ENDPOINT_CONFIG } from "@/lib/layerzero";
 import { ChainId } from "@/lib/types";
 import { deriveAccountFromUid } from "@/lib/utils";
 
@@ -60,7 +60,7 @@ export function useDeposit() {
       });
 
       /* Deploy Source Pool */
-      const layerZeroSrcEndpoint = LAYERZERO_ENDPOINT_ADDRESS[chainId];
+      const layerZeroSrcEndpoint = LAYERZERO_ENDPOINT_CONFIG[chainId].address;
       const delegate = derivedAccount.address;
       const expireDate = BigInt(Date.now() / 1000 + 60 * 60 * 24 * daysLocked);
 
@@ -96,7 +96,7 @@ export function useDeposit() {
         transport: http(),
       });
 
-      const layerZeroDstEndpoint = LAYERZERO_ENDPOINT_ADDRESS[collateralChainId as ChainId];
+      const layerZeroDstEndpoint = LAYERZERO_ENDPOINT_CONFIG[collateralChainId as ChainId].address;
 
       const { request: deployDstPoolRequest } = await dstPublicClient.simulateContract({
         account: derivedAccount,
