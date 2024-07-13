@@ -68,36 +68,6 @@ export function useDeposit(options?: UseDepositOptions) {
         transport: http(),
       });
 
-      /* Deploy Source Pool */
-      const layerZeroSrcEndpoint = LAYERZERO_ENDPOINT_CONFIG[chainId].address;
-      const delegate = account?.address || address;
-      const expireDate = BigInt(Date.now() / 1000 + 60 * 60 * 24 * daysLocked);
-
-      const { request: deploySrcPoolRequest } = await srcPublicClient.simulateContract({
-        account,
-        address: POOL_FACTORY_ADDRESS[chainId],
-        abi: poolFactoryAbi,
-        functionName: "deploySrcPool",
-        args: [
-          layerZeroSrcEndpoint,
-          delegate,
-          collateralChainId,
-          asset as `0x${string}`,
-          collateralAsset as `0x${string}`,
-          BigInt(ltv),
-          BigInt(interestRate),
-          expireDate,
-        ],
-      });
-      const deploySrcTxnHash = await srcWalletClient.writeContract(deploySrcPoolRequest);
-
-      toast({
-        title: "Deployed source pool",
-        description: "Successfully deployed source pool.",
-        action: <TransactionLinkButton chainId={chainId} txnHash={deploySrcTxnHash} />,
-        variant: "default",
-      });
-
       /* Deploy Destination Pool */
       const dstChain = chains.find((chain) => chain.id === collateralChainId);
       if (!dstChain) throw Error("Chain not found");
@@ -113,6 +83,7 @@ export function useDeposit(options?: UseDepositOptions) {
       });
 
       const layerZeroDstEndpoint = LAYERZERO_ENDPOINT_CONFIG[collateralChainId as ChainId].address;
+      const delegate = account?.address || address;
 
       const { request: deployDstPoolRequest } = await dstPublicClient.simulateContract({
         account,
@@ -126,20 +97,74 @@ export function useDeposit(options?: UseDepositOptions) {
         hash: deployDstTxnHash,
       });
 
-      const log = receipt.logs[0];
-      const event = decodeEventLog({
-        data: log.data,
-        topics: log.topics,
-        abi: poolFactoryAbi,
-      });
+      let dstPoolAddress: `0x${string}` | undefined = undefined;
 
-      // @ts-ignore
-      const srcPoolAddress = event.args.srcPoolAddress;
+      for (let i = 0; i < receipt.logs.length; i++) {
+        const log = receipt.logs[i];
+        const event = decodeEventLog({
+          data: log.data,
+          topics: log.topics,
+          abi: poolFactoryAbi,
+        });
+        if (event.eventName === "DeployedDstPool") {
+          dstPoolAddress = event.args.dstPoolAddress;
+          break;
+        }
+      }
+
+      if (!dstPoolAddress) throw Error("Destination pool address not found");
 
       toast({
         title: "Deployed destination pool",
         description: "Successfully deployed destination pool.",
         action: <TransactionLinkButton chainId={chainId} txnHash={deployDstTxnHash} />,
+        variant: "default",
+      });
+
+      /* Deploy Source Pool */
+      const layerZeroSrcEndpoint = LAYERZERO_ENDPOINT_CONFIG[chainId].address;
+      const expireDate = BigInt(Date.now() / 1000 + 60 * 60 * 24 * daysLocked);
+
+      const { request: deploySrcPoolRequest } = await srcPublicClient.simulateContract({
+        account,
+        address: POOL_FACTORY_ADDRESS[chainId],
+        abi: poolFactoryAbi,
+        functionName: "deploySrcPool",
+        args: [
+          layerZeroSrcEndpoint,
+          delegate,
+          collateralChainId, // TODO: chain id to layerzero endpoitn
+          dstPoolAddress,
+          asset as `0x${string}`,
+          collateralAsset as `0x${string}`,
+          BigInt(ltv),
+          BigInt(interestRate),
+          expireDate,
+        ],
+      });
+      const deploySrcTxnHash = await srcWalletClient.writeContract(deploySrcPoolRequest);
+
+      let srcPoolAddress: `0x${string}` | undefined = undefined;
+
+      for (let i = 0; i < receipt.logs.length; i++) {
+        const log = receipt.logs[i];
+        const event = decodeEventLog({
+          data: log.data,
+          topics: log.topics,
+          abi: poolFactoryAbi,
+        });
+        if (event.eventName === "DeployedSrcPool") {
+          dstPoolAddress = event.args.srcPoolAddress;
+          break;
+        }
+      }
+
+      if (!srcPoolAddress) throw Error("Source pool address not found");
+
+      toast({
+        title: "Deployed source pool",
+        description: "Successfully deployed source pool.",
+        action: <TransactionLinkButton chainId={chainId} txnHash={deploySrcTxnHash} />,
         variant: "default",
       });
 

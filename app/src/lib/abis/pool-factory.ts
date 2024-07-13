@@ -1,5 +1,31 @@
 export const poolFactoryAbi = [
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "dstPoolAddress",
+        type: "address",
+      },
+    ],
+    name: "DeployedDstPool",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "srcPoolAddress",
+        type: "address",
+      },
+    ],
+    name: "DeployedSrcPool",
+    type: "event",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -23,13 +49,7 @@ export const poolFactoryAbi = [
       },
     ],
     name: "deployDstPool",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -49,6 +69,11 @@ export const poolFactoryAbi = [
         internalType: "uint32",
         name: "_dstChainId",
         type: "uint32",
+      },
+      {
+        internalType: "address",
+        name: "_dstPoolAddress",
+        type: "address",
       },
       {
         internalType: "address",
@@ -77,13 +102,7 @@ export const poolFactoryAbi = [
       },
     ],
     name: "deploySrcPool",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
