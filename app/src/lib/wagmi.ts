@@ -1,5 +1,5 @@
 import { http } from "viem";
-import { arbitrumSepolia, mainnet, sepolia } from "viem/chains";
+import { arbitrumSepolia, baseSepolia, mainnet, sepolia } from "viem/chains";
 import { createConfig } from "wagmi";
 
 declare module "wagmi" {
@@ -9,11 +9,12 @@ declare module "wagmi" {
 }
 
 export const config = createConfig({
-  chains: [mainnet, sepolia, arbitrumSepolia],
+  chains: [mainnet, sepolia, arbitrumSepolia, baseSepolia],
   multiInjectedProviderDiscovery: false,
   transports: {
     [mainnet.id]: http(),
     [sepolia.id]: http(),
     [arbitrumSepolia.id]: http(),
+    [baseSepolia.id]: http(),
   },
 });

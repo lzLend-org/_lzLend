@@ -1,4 +1,4 @@
-import { arbitrumSepolia, mainnet, sepolia } from "viem/chains";
+import { arbitrumSepolia, baseSepolia, mainnet, sepolia } from "viem/chains";
 
 import { ChainId } from "@/lib/types";
 
@@ -19,6 +19,10 @@ export const LAYERZERO_ENDPOINT_CONFIG: Record<
   },
   [arbitrumSepolia.id]: {
     id: 40231,
+    address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+  },
+  [baseSepolia.id]: {
+    id: 40245,
     address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
   },
 };
