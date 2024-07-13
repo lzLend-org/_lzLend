@@ -1,0 +1,26 @@
+{
+  "extends": ["next/core-web-vitals", "plugin:tailwindcss/recommended"],
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": ["error", {}],
+    "react/no-unescaped-entities": ["error", { "forbid": [">", "}"] }],
+    /* Sort imports */
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "type"],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc"
+        }
+      }
+    ]
+  },
+  "settings": {
+    /* Support tailwind rules inside class utility functions */
+    "tailwindcss": {
+      "callees": ["clsx", "cva", "cn"],
+      "config": "tailwind.config.ts"
+    }
+  }
+}
