@@ -107,8 +107,7 @@ contract SrcPool is OApp {
         Loan storage loan = loans[_sender];
         require(loan.amount > 0, "Pool: no loan to repay");
 
-        uint256 interest = (loan.amount *
-            poolMetadata.apr *
+        uint256 interest = (((loan.amount * poolMetadata.apr) / 10000) *
             (block.timestamp - loan.startTime)) / (365 days * 100);
         return loan.amount + interest;
     }
