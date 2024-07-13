@@ -17,7 +17,7 @@ contract PythOracle {
         pyth.updatePriceFeeds{value: updateFee}(pythPriceUpdate);
     }
 
-    function getLastPrices() public view returns (PythStructs.Price[] memory) {
+    function read() public view returns (PythStructs.Price[] memory) {
         PythStructs.Price[] memory prices = new PythStructs.Price[](
             priceFeedIds.length
         );

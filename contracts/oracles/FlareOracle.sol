@@ -4,11 +4,7 @@ pragma solidity ^0.8.24;
 import {IFlareContractRegistry} from "@flarenetwork/flare-periphery-contracts/coston2/util-contracts/userInterfaces/IFlareContractRegistry.sol";
 import {IFastUpdater} from "@flarenetwork/flare-periphery-contracts/coston2/ftso/userInterfaces/IFastUpdater.sol";
 
-/**
- * THIS IS AN EXAMPLE CONTRACT.
- * DO NOT USE THIS CODE IN PRODUCTION.
- */
-contract FtsoV2FeedConsumer {
+contract FlareOracle {
     IFlareContractRegistry internal contractRegistry;
     IFastUpdater internal ftsoV2;
     // Feed indexes: 0 = FLR/USD, 2 = BTC/USD, 9 = ETH/USD
@@ -30,7 +26,7 @@ contract FtsoV2FeedConsumer {
     /**
      * Get the current value of the feeds.
      */
-    function getFtsoV2CurrentFeedValues()
+    function read()
         external
         view
         returns (

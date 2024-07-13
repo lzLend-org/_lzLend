@@ -8,6 +8,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract SrcPool is OApp {
     struct PoolMetadata {
+        address poolOwner;
         uint256 poolBalance;
         address poolToken;
         address collateralToken;
@@ -39,6 +40,7 @@ contract SrcPool is OApp {
         uint256 _expiry
     ) OApp(_endpoint, _delegate) Ownable(_delegate) {
         dstChainId = _dstChainId;
+        poolMetadata.poolOwner = _delegate;
         poolMetadata.poolToken = _poolToken;
         poolMetadata.collateralToken = _collateralToken;
         poolMetadata.ltv = _ltv;

@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import '../interfaces/IChronicle.sol';
+import '../interfaces/ISelfKisser.sol';
+
 /**
  * @title OracleReader
  * @notice A simple contract to read from Chronicle oracles
@@ -8,35 +11,25 @@ pragma solidity ^0.8.24;
  * For other supported networks, check https://chroniclelabs.org/dashboard/oracles.
  */
 contract OracleReader {
-    ///  @notice The Chronicle ETH/USD oracle.
-    IChronicle public immutable chronicle;
+    IChronicle[] public chronicleOracles;
 
     /// @notice The SelfKisser granting access to Chronicle oracles.
     ISelfKisser public immutable selfKisser;
 
-    constructor(address chronicle_, address selfKisser_) {
-        chronicle = IChronicle(chronicle_);
+    constructor(address[] memory chronicleAddresses, address selfKisser_) {
         selfKisser = ISelfKisser(selfKisser_);
-
-        // Note to add address(this) to chronicle oracle's whitelist.
-        // This allows the contract to read from the chronicle oracle.
-        selfKisser.selfKiss(address(chronicle));
+        for (uint256 i = 0; i < chronicleAddresses.length; i++) {
+            IChronicle chronicle = IChronicle(chronicleAddresses[i]);
+            chronicleOracles.push(chronicle);
+            selfKisser.selfKiss(address(chronicle));
+        }
     }
 
-    /// @notice Function to read the latest data from the Chronicle oracle.
-    /// @return val The current value returned by the oracle.
-    function read() external view returns (uint256 val) {
-        return chronicle.read();
+    function read() external view returns (uint256[] memory vals) {
+        uint256[] memory values = new uint256[](chronicleOracles.length);
+        for (uint256 i = 0; i < chronicleOracles.length; i++) {
+            values[i] = chronicleOracles[i].read();
+        }
+        return values;
     }
-}
-
-// Copied from [chronicle-std](https://github.com/chronicleprotocol/chronicle-std/blob/main/src/IChronicle.sol).
-interface IChronicle {
-    function read() external view returns (uint256 value);
-}
-
-// Copied from [self-kisser](https://github.com/chronicleprotocol/self-kisser/blob/main/src/ISelfKisser.sol).
-interface ISelfKisser {
-    /// @notice Kisses caller on oracle `oracle`.
-    function selfKiss(address oracle) external;
 }
