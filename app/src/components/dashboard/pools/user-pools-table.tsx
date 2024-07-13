@@ -15,19 +15,19 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { pools } from "@/lib/data";
+// import { pools } from "@/lib/data";
 import { usePools } from "@/lib/hooks/pools/use-pools";
 import { APR_DECIMALS, LTV_DECIMALS, getDaysDifference } from "@/lib/utils";
 
 export function UserPoolsTable() {
   const { address } = useAccount();
   const chains = useChains();
-  const { data } = usePools({
+  const { data: userPools } = usePools({
     owner: address,
     enabled: !!address,
   });
 
-  console.log("User Pools: ", data);
+  // console.log("User Pools: ", data);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -53,7 +53,7 @@ export function UserPoolsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pools.map((pool, index) => (
+            {userPools?.map((pool, index) => (
               <TableRow key={index}>
                 <TableCell>{chains.find((chain) => chain.id === pool.chainId)?.name}</TableCell>
                 <TableCell>{pool.asset.symbol}</TableCell>

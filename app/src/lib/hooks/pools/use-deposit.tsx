@@ -181,6 +181,8 @@ export function useDeposit(options?: UseDepositOptions) {
         BigInt(collateralAsset.oraclePriceIndex),
       ];
 
+      console.log("loanAssetAddress", loanAssetAddress);
+
       const { request: deploySrcPoolRequest } = await srcPublicClient.simulateContract({
         account,
         address: POOL_SRC_FACTORY_ADDRESS[chainId],
