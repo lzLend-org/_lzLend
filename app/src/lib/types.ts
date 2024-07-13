@@ -17,6 +17,7 @@ export interface Pool {
   owner: `0x${string}`;
   collateralChainId: ChainId;
   collateralAsset: Asset;
+  dstPoolAddress: `0x${string}`;
   apr: bigint;
   expireDate: bigint;
   ltv: bigint;

@@ -1,12 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
-import { createWalletClient, http, createPublicClient } from "viem";
+import { createWalletClient, http, createPublicClient, parseUnits } from "viem";
 import { useAccount, useChains } from "wagmi";
 import { z } from "zod";
 
 import { dstPoolAbi } from "@/lib/abis/dst-pool";
+import { assets } from "@/lib/assets";
 import { isDerivedAccountEnabledAtom } from "@/lib/settings";
-import { Pool } from "@/lib/types";
+import { ChainId, Pool } from "@/lib/types";
 import { deriveAccountFromUid } from "@/lib/utils";
 
 export const getBorrowSchema = (max: number) =>
@@ -34,31 +35,37 @@ export function useBorrow({ pool }: UseBorrowOptions) {
     }: BorrowData) => {
       if (!address) throw Error("Address not found");
 
-      const chain = chains.find((chain) => chain.id === pool.collateralChainId);
-      if (!chain) throw Error("Chain not found");
+      const collateralChain = chains.find((chain) => chain.id === pool.collateralChainId);
+      if (!collateralChain) throw Error("Chain not found");
 
       const derivedAccount = deriveAccountFromUid(address);
       const account = isDerivedAccountEnabled ? derivedAccount : undefined;
 
       const walletClient = createWalletClient({
         account,
-        chain,
+        chain: collateralChain,
         transport: http(),
       });
       const publicClient = createPublicClient({
-        chain,
+        chain: collateralChain,
         transport: http(),
       });
 
       /* Borrow */
-      const dstPoolAddress = "0x"; // TODO: get dst pool address
+      const borrowAsset = assets[collateralChain.id as ChainId].find(
+        (a) => a.address === pool.collateralAsset.address,
+      );
+      if (!borrowAsset) throw Error("Deposit asset not found");
+
+      const borrowAmount = parseUnits(amount.toString(), borrowAsset.decimals);
+      const collateralAmount = (borrowAmount / pool.ltv) * BigInt(10000);
 
       const { request } = await publicClient.simulateContract({
         account,
-        address: dstPoolAddress,
+        address: pool.dstPoolAddress,
         abi: dstPoolAbi,
         functionName: "takeLoan",
-        args: [BigInt(amount)],
+        args: [collateralAmount],
       });
       await walletClient.writeContract(request);
     },

@@ -1,6 +1,13 @@
 import { UseMutationOptions, useMutation } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
-import { createWalletClient, http, erc20Abi, createPublicClient, decodeEventLog } from "viem";
+import {
+  createWalletClient,
+  http,
+  erc20Abi,
+  createPublicClient,
+  decodeEventLog,
+  parseUnits,
+} from "viem";
 import { getTransactionReceipt } from "viem/actions";
 import { useAccount, useChainId, useChains } from "wagmi";
 import { z } from "zod";
@@ -10,10 +17,11 @@ import { toast } from "@/components/ui/use-toast";
 import { poolFactoryAbi } from "@/lib/abis/pool-factory";
 import { srcPoolAbi } from "@/lib/abis/src-pool";
 import { POOL_FACTORY_ADDRESS } from "@/lib/addresses";
+import { assets } from "@/lib/assets";
 import { LAYERZERO_ENDPOINT_CONFIG } from "@/lib/layerzero";
 import { isDerivedAccountEnabledAtom } from "@/lib/settings";
 import { ChainId } from "@/lib/types";
-import { deriveAccountFromUid } from "@/lib/utils";
+import { APR_DECIMALS, LTV_DECIMALS, deriveAccountFromUid } from "@/lib/utils";
 
 export const depositSchema = z.object({
   asset: z.string().min(1),
@@ -68,7 +76,7 @@ export function useDeposit(options?: UseDepositOptions) {
         transport: http(),
       });
 
-      /* Deploy Destination Pool */
+      /* ------- Deploy Destination Pool ------- */
       const dstChain = chains.find((chain) => chain.id === collateralChainId);
       if (!dstChain) throw Error("Chain not found");
 
@@ -82,7 +90,9 @@ export function useDeposit(options?: UseDepositOptions) {
         transport: http(),
       });
 
-      const layerZeroDstEndpoint = LAYERZERO_ENDPOINT_CONFIG[collateralChainId as ChainId].address;
+      const layerZeroDstEndpoint = LAYERZERO_ENDPOINT_CONFIG[collateralChainId as ChainId];
+      const layerZeroDstEndpointAddress = layerZeroDstEndpoint.address;
+      const LayerZeroDstEndpointId = layerZeroDstEndpoint.id;
       const delegate = account?.address || address;
 
       const { request: deployDstPoolRequest } = await dstPublicClient.simulateContract({
@@ -90,7 +100,12 @@ export function useDeposit(options?: UseDepositOptions) {
         address: POOL_FACTORY_ADDRESS[chainId],
         abi: poolFactoryAbi,
         functionName: "deployDstPool",
-        args: [layerZeroDstEndpoint, delegate, collateralAsset as `0x${string}`, collateralChainId],
+        args: [
+          layerZeroDstEndpointAddress,
+          delegate,
+          collateralAsset as `0x${string}`,
+          LayerZeroDstEndpointId,
+        ],
       });
       const deployDstTxnHash = await dstWalletClient.writeContract(deployDstPoolRequest);
       const receipt = await getTransactionReceipt(dstPublicClient, {
@@ -121,9 +136,11 @@ export function useDeposit(options?: UseDepositOptions) {
         variant: "default",
       });
 
-      /* Deploy Source Pool */
+      /* ------- Deploy Source Pool ------- */
       const layerZeroSrcEndpoint = LAYERZERO_ENDPOINT_CONFIG[chainId].address;
       const expireDate = BigInt(Date.now() / 1000 + 60 * 60 * 24 * daysLocked);
+      const parsedLtv = parseUnits(ltv.toString(), LTV_DECIMALS);
+      const parsedApr = parseUnits(interestRate.toString(), APR_DECIMALS);
 
       const { request: deploySrcPoolRequest } = await srcPublicClient.simulateContract({
         account,
@@ -133,12 +150,12 @@ export function useDeposit(options?: UseDepositOptions) {
         args: [
           layerZeroSrcEndpoint,
           delegate,
-          collateralChainId, // TODO: chain id to layerzero endpoitn
+          LayerZeroDstEndpointId,
           dstPoolAddress,
           asset as `0x${string}`,
           collateralAsset as `0x${string}`,
-          BigInt(ltv),
-          BigInt(interestRate),
+          parsedLtv,
+          parsedApr,
           expireDate,
         ],
       });
@@ -168,13 +185,17 @@ export function useDeposit(options?: UseDepositOptions) {
         variant: "default",
       });
 
-      /* Approve */
+      /* ------- Approve ------- */
+      const depositAsset = assets[chainId].find((a) => a.symbol === asset);
+      if (!depositAsset) throw Error("Deposit asset not found");
+
+      const depositAmount = parseUnits(amount.toString(), depositAsset.decimals);
       const { request: approveRequest } = await srcPublicClient.simulateContract({
         account,
         address: asset as `0x${string}`,
         abi: erc20Abi,
         functionName: "approve",
-        args: [srcPoolAddress, BigInt(amount)],
+        args: [srcPoolAddress, depositAmount],
       });
       const approveTxnHash = await srcWalletClient.writeContract(approveRequest);
 
@@ -185,13 +206,13 @@ export function useDeposit(options?: UseDepositOptions) {
         variant: "default",
       });
 
-      /* Deposit */
+      /* ------- Deposit -------*/
       const { request: depositRequest } = await srcPublicClient.simulateContract({
         account,
         address: srcPoolAddress,
         abi: srcPoolAbi,
         functionName: "deposit",
-        args: [BigInt(amount)],
+        args: [depositAmount],
       });
       return await srcWalletClient.writeContract(depositRequest);
     },
