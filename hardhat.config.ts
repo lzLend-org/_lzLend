@@ -7,7 +7,15 @@ import "./scripts/generate"
 const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.24",
+  solidity: {
+    compilers: [{ version: "0.8.24" }],
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
   defaultNetwork: "localhost",
   networks: {
     localhost: {

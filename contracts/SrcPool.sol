@@ -7,13 +7,17 @@ import {MessagingReceipt} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OAp
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract SrcPool is OApp {
+    struct PoolMetadata {
+        uint256 poolBalance;
+        address poolToken;
+        address collateralToken;
+        uint256 ltv;
+        uint256 apr;
+        uint256 expiry;
+    }
+
     uint32 public dstChainId;
-    uint256 public poolBalance;
-    address public poolToken;
-    address public collateralToken;
-    uint256 public ltv;
-    uint256 public apr;
-    uint256 public expiry;
+    PoolMetadata public poolMetadata;
 
     struct Loan {
         uint256 amount;
@@ -35,28 +39,28 @@ contract SrcPool is OApp {
         uint256 _expiry
     ) OApp(_endpoint, _delegate) Ownable(_delegate) {
         dstChainId = _dstChainId;
-        poolToken = _poolToken;
-        collateralToken = _collateralToken;
-        ltv = _ltv;
-        apr = _apr;
-        expiry = _expiry;
+        poolMetadata.poolToken = _poolToken;
+        poolMetadata.collateralToken = _collateralToken;
+        poolMetadata.ltv = _ltv;
+        poolMetadata.apr = _apr;
+        poolMetadata.expiry = _expiry;
 
-        poolBalance = 0;
+        poolMetadata.poolBalance = 0;
     }
 
     function repayLoan() external returns (MessagingReceipt memory receipt) {
         require(loans[msg.sender].amount > 0, "Pool: no loan to repay");
-        require(block.timestamp <= expiry, "Pool: loan expired");
+        require(block.timestamp <= poolMetadata.expiry, "Pool: loan expired");
         require(
-            IERC20(poolToken).balanceOf(msg.sender) >=
+            IERC20(poolMetadata.poolToken).balanceOf(msg.sender) >=
                 getRepaymentAmount(msg.sender),
             "Pool: insufficient balance"
         );
         uint256 totalRepayment = getRepaymentAmount(msg.sender);
-        poolBalance += totalRepayment;
+        poolMetadata.poolBalance += totalRepayment;
 
         require(
-            IERC20(poolToken).transferFrom(
+            IERC20(poolMetadata.poolToken).transferFrom(
                 msg.sender,
                 address(this),
                 totalRepayment
@@ -79,15 +83,22 @@ contract SrcPool is OApp {
     function deposit(uint256 _amount) external onlyOwner {
         require(_amount > 0, "Pool: amount must be greater than 0");
         require(
-            IERC20(poolToken).allowance(msg.sender, address(this)) >= _amount,
+            IERC20(poolMetadata.poolToken).allowance(
+                msg.sender,
+                address(this)
+            ) >= _amount,
             "Pool: insufficient allowance"
         );
         require(
-            IERC20(poolToken).balanceOf(msg.sender) >= _amount,
+            IERC20(poolMetadata.poolToken).balanceOf(msg.sender) >= _amount,
             "Pool: insufficient balance"
         );
-        IERC20(poolToken).transferFrom(msg.sender, address(this), _amount);
-        poolBalance += _amount;
+        IERC20(poolMetadata.poolToken).transferFrom(
+            msg.sender,
+            address(this),
+            _amount
+        );
+        poolMetadata.poolBalance += _amount;
     }
 
     function getRepaymentAmount(address _sender) public view returns (uint256) {
@@ -95,7 +106,7 @@ contract SrcPool is OApp {
         require(loan.amount > 0, "Pool: no loan to repay");
 
         uint256 interest = (loan.amount *
-            apr *
+            poolMetadata.apr *
             (block.timestamp - loan.startTime)) / (365 days * 100);
         return loan.amount + interest;
     }
@@ -114,17 +125,28 @@ contract SrcPool is OApp {
         );
         // TODO: INSERT ORACLES HERE...
         // TODO: LOGIC HERE IS WRONG...
-        uint256 loanAmount = (collateral * ltv) / 100;
-        require(poolBalance >= loanAmount, "Pool: insufficient balance");
+        uint256 loanAmount = (collateral * poolMetadata.ltv) / 100;
+        require(
+            poolMetadata.poolBalance >= loanAmount,
+            "Pool: insufficient balance"
+        );
         loans[borrower] = Loan(
             loanAmount,
             collateral,
             block.timestamp,
             borrower
         );
-        poolBalance -= loanAmount;
+        poolMetadata.poolBalance -= loanAmount;
 
         // IERC20(poolToken).approve(address(this), loanAmount);
-        IERC20(poolToken).transferFrom(address(this), borrower, loanAmount);
+        IERC20(poolMetadata.poolToken).transferFrom(
+            address(this),
+            borrower,
+            loanAmount
+        );
+    }
+
+    function getPoolMetadata() external view returns (PoolMetadata memory) {
+        return poolMetadata;
     }
 }
