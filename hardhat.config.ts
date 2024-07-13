@@ -29,6 +29,10 @@ const config: HardhatUserConfig = {
       url: process.env.OPTIMISM_SEPOLIA_RPC_URL || "https://rpc.ankr.com/optimism_sepolia",
       accounts,
     },
+    coston2: {
+      url: process.env.COSTON2_RPC_URL || "https://coston2-api.flare.network/ext/C/rpc",
+      accounts,
+    },
     mumbai: {
       url: process.env.MUMBAI_RPC_URL || "https://rpc.ankr.com/polygon_mumbai",
       accounts,

@@ -23,8 +23,8 @@ contract PythOracle {
         );
         for (uint i = 0; i < priceFeedIds.length; i++) {
             // TODO: FIGURE OUT THE PRICE FEED IDS
-            uint updateFee = pyth.getUpdateFee(priceFeedIds[i]);
-            pyth.updatePriceFeeds{value: updateFee}(priceFeedIds[i]);
+            // uint updateFee = pyth.getUpdateFee(priceFeedIds[i]);
+            // pyth.updatePriceFeeds{value: updateFee}(priceFeedIds[i]);
             prices[i] = pyth.getPrice(priceFeedIds[i]);
         }
         return prices;

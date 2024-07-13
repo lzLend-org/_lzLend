@@ -1,19 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import '../interfaces/IChronicle.sol';
-import '../interfaces/ISelfKisser.sol';
+import "../interfaces/IChronicle.sol";
+import "../interfaces/ISelfKisser.sol";
 
-/**
- * @title OracleReader
- * @notice A simple contract to read from Chronicle oracles
- * @dev Addresses in this contract are hardcoded for the Sepolia testnet.
- * For other supported networks, check https://chroniclelabs.org/dashboard/oracles.
- */
-contract OracleReader {
+contract ChronicleOracle {
     IChronicle[] public chronicleOracles;
-
-    /// @notice The SelfKisser granting access to Chronicle oracles.
     ISelfKisser public immutable selfKisser;
 
     constructor(address[] memory chronicleAddresses, address selfKisser_) {
@@ -23,6 +15,7 @@ contract OracleReader {
             chronicleOracles.push(chronicle);
             selfKisser.selfKiss(address(chronicle));
         }
+        // selfKisser.selfKiss(address(this));
     }
 
     function read() external view returns (uint256[] memory vals) {
