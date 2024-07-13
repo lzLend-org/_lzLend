@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { createWalletClient, http, erc20Abi, createPublicClient } from "viem";
+import { createWalletClient, http, erc20Abi, createPublicClient, decodeEventLog } from "viem";
+import { getTransactionReceipt } from "viem/actions";
 import { useAccount, useChainId, useChains } from "wagmi";
 import { z } from "zod";
 
@@ -104,11 +105,22 @@ export function useDeposit() {
         functionName: "deployDstPool",
         args: [layerZeroDstEndpoint, delegate, collateralAsset as `0x${string}`, collateralChainId],
       });
-      await dstWalletClient.writeContract(deployDstPoolRequest);
+      const txnHash = await dstWalletClient.writeContract(deployDstPoolRequest);
+      const receipt = await getTransactionReceipt(dstPublicClient, {
+        hash: txnHash,
+      });
+
+      const log = receipt.logs[0];
+      const event = decodeEventLog({
+        data: log.data,
+        topics: log.topics,
+        abi: poolFactoryAbi,
+      });
+
+      // @ts-ignore
+      const srcPoolAddress = event.args.srcPoolAddress;
 
       /* Approve */
-      const srcPoolAddress = "0x"; // TODO: get pool address from transaction logs
-
       const { request: approveRequest } = await srcPublicClient.simulateContract({
         account: derivedAccount,
         address: asset as `0x${string}`,
