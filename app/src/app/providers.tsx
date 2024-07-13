@@ -13,7 +13,7 @@ import { config } from "@/lib/wagmi";
 
 const queryClient = new QueryClient();
 
-const cssOverrides = `
+const cssOverrides = `  
 .dynamic-shadow-dom {
   --dynamic-font-family-primary: "General Sans", sans-serif;
   --dynamic-connect-button-background-hover: #eee !important;
