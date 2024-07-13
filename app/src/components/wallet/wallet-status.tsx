@@ -12,7 +12,7 @@ export const WalletStatus = () => {
   if (!isConnected) {
     return (
       <Button onClick={() => setShowAuthFlow(true)} variant={"accent"}>
-        Connect
+        Login
       </Button>
     );
   }

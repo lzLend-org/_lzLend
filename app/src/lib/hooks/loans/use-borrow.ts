@@ -12,7 +12,7 @@ import { deriveAccountFromUid } from "@/lib/utils";
 
 export const getBorrowSchema = (max: number) =>
   z.object({
-    amount: z.number().positive().lte(max),
+    collateralAmount: z.number().positive().lte(max),
     // collateralAsset: z.string().min(1),
   });
 
@@ -30,7 +30,7 @@ export function useBorrow({ pool }: UseBorrowOptions) {
 
   return useMutation({
     mutationFn: async ({
-      amount,
+      collateralAmount,
       // collateralAsset
     }: BorrowData) => {
       if (!address) throw Error("Address not found");
@@ -52,20 +52,30 @@ export function useBorrow({ pool }: UseBorrowOptions) {
       });
 
       /* Borrow */
-      const borrowAsset = assets[collateralChain.id as ChainId].find(
+      // const borrowAsset = assets[collateralChain.id as ChainId].find(
+      //   (a) => a.address === pool.asset.address,
+      // );
+      // if (!borrowAsset) throw Error("Borrow asset not found");
+
+      // const borrowAmount = parseUnits(amount.toString(), borrowAsset.decimals);
+      // const collateralAmount = (borrowAmount / pool.ltv) * BigInt(10000);
+
+      const collateralAsset = assets[collateralChain.id as ChainId].find(
         (a) => a.address === pool.collateralAsset.address,
       );
-      if (!borrowAsset) throw Error("Deposit asset not found");
+      if (!collateralAsset) throw Error("Collateral asset not found");
 
-      const borrowAmount = parseUnits(amount.toString(), borrowAsset.decimals);
-      const collateralAmount = (borrowAmount / pool.ltv) * BigInt(10000);
+      const parsedCollateralAmount = parseUnits(
+        collateralAmount.toString(),
+        collateralAsset.decimals,
+      );
 
       const { request } = await publicClient.simulateContract({
         account,
         address: pool.dstPoolAddress,
         abi: dstPoolAbi,
         functionName: "takeLoan",
-        args: [collateralAmount],
+        args: [parsedCollateralAmount],
       });
       await walletClient.writeContract(request);
     },
