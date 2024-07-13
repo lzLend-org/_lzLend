@@ -6,7 +6,6 @@ import { POOL_SRC_FACTORY_ADDRESS } from "@/lib/addresses";
 import { assets } from "@/lib/assets";
 import { LAYERZERO_ENDPOINT_CONFIG } from "@/lib/layerzero";
 import { ChainId, Pool } from "@/lib/types";
-import { deriveAccountFromUid } from "@/lib/utils";
 import { config } from "@/lib/wagmi";
 
 const allPoolFactories = Object.entries(POOL_SRC_FACTORY_ADDRESS).map(
@@ -24,9 +23,6 @@ export interface GetPoolsParams {
 
 export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
   const { owner } = params || {};
-  const ownerDerivedAddress = owner ? deriveAccountFromUid(owner).address : undefined;
-
-  console.log("Owner: ", ownerDerivedAddress);
 
   const chains = getChains(config);
 
@@ -37,13 +33,13 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
           address: poolFactory.address,
           abi: poolFactory.abi,
           chainId: poolFactory.chainId,
-          functionName: ownerDerivedAddress ? "getSrcPoolsByOwner" : "getAllSrcPools",
-          args: ownerDerivedAddress ? [ownerDerivedAddress] : undefined,
+          functionName: owner ? "getSrcPoolsByOwner" : "getAllSrcPools",
+          args: owner ? [owner] : undefined,
         }) as const,
     ),
   });
 
-  console.log("poolResults: ", poolResults);
+  // console.log("poolResults: ", poolResults);
 
   const poolAddresses: { chainId: ChainId; address: `0x${string}` }[] = [];
 
@@ -68,23 +64,18 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
     ),
   });
 
-  console.log("poolMetadataResults: ", poolMetadataResults);
+  // console.log("poolMetadataResults: ", poolMetadataResults);
 
   const srcPools: (Pool | null)[] = poolMetadataResults.map((result, index) => {
     const poolMetadata = result.result;
 
-    console.log("Pool Metadata: ", poolMetadata);
     if (!poolMetadata) return null;
 
     const chainId = (chains.find((chain) => chain.id === poolAddresses[index].chainId)?.id ||
       chains[0].id) as ChainId;
 
-    console.log("Chain Id: ", chainId);
-
     const asset = assets[chainId].find((asset) => asset.address === poolMetadata.poolToken);
     if (!asset) return null;
-
-    console.log("Asset: ", asset);
 
     const entry = Object.entries(LAYERZERO_ENDPOINT_CONFIG).find(
       ([, config]) => config.id === poolMetadata.dstChainId,
@@ -96,10 +87,6 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
       (asset) => asset.address === poolMetadata.collateralToken,
     );
     if (!collateralAsset) return null;
-
-    console.log("Collateral Asset: ", collateralAsset);
-
-    console.log("Collateral Chain Id: ", collateralChainId);
 
     return {
       chainId,
@@ -116,7 +103,7 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
     };
   });
 
-  console.log("Src Pools: ", srcPools);
+  // console.log("Src Pools: ", srcPools);
 
   return srcPools.filter((pool): pool is Pool => pool !== null && pool.amount > BigInt(0));
 }

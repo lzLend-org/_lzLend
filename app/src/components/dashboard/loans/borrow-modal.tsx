@@ -5,7 +5,7 @@ import { formatUnits } from "viem";
 import { useChains } from "wagmi";
 
 import { Button } from "@/components/ui/button";
-import { BaseDialogProps, Dialog, DialogContent } from "@/components/ui/dialog";
+import { BaseDialogProps, Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,7 +40,7 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
   } = form;
   const collateralAmount = watch("collateralAmount");
 
-  const { mutate: borrow } = useBorrow({
+  const { mutate: borrow, isPending } = useBorrow({
     pool,
   });
 
@@ -58,7 +58,7 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
       modal={true}
     >
       <DialogContent className="flex max-h-[90vh] max-w-md flex-col px-6">
-        <h2 className="text-xl font-semibold">Borrow</h2>
+        <DialogTitle className="text-xl font-semibold">Borrow</DialogTitle>
 
         <Form {...form}>
           <form onSubmit={onSubmit} className="flex flex-col gap-3">
@@ -86,6 +86,10 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
                 {chains.find((chain) => chain.id === pool.collateralChainId)?.name}
               </div>
             </div>
+            <div className="flex items-center justify-between">
+              <div className="text-muted-foreground">Collateral Asset</div>
+              <div className="font-medium">{pool.collateralAsset.symbol}</div>
+            </div>
             {/* <div className="flex items-center justify-between">
             <div className="text-muted-foreground">Collateral</div>
             <div className="font-medium">30 USDC</div>
@@ -104,7 +108,7 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
                 autoComplete="off"
                 tabIndex={-1}
                 step={0.01}
-                // disabled={isPending}
+                disabled={isPending}
                 {...register("collateralAmount", { valueAsNumber: true })}
               />
               {errors?.collateralAmount && (
@@ -114,7 +118,9 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
 
             <div className="flex items-center justify-between">
               <div className="text-muted-foreground">Borrow Amount</div>
-              <div className="font-medium">{collateralAmount * 2}</div>
+              <div className="font-medium">
+                {collateralAmount * 2} {pool.asset.symbol}
+              </div>
               {/* TODO: Calculate borrow amount based on collateral amount */}
             </div>
 
@@ -145,17 +151,14 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
 
             <div className="flex items-center justify-end gap-2">
               <Button
-                // disabled={isPending}
+                disabled={isPending}
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
               >
                 Cancel
               </Button>
-              <Button
-              // disabled={isPending}
-              // loading={isPending}
-              >
+              <Button disabled={isPending} loading={isPending}>
                 Borrow
               </Button>
             </div>

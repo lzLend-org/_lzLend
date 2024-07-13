@@ -13,6 +13,7 @@ import { z } from "zod";
 
 import { TransactionLinkButton } from "@/components/transaction-link-button";
 import { toast } from "@/components/ui/use-toast";
+import { dstPoolAbi } from "@/lib/abis/dst-pool";
 import { poolDstFactoryAbi } from "@/lib/abis/pool-dst-factory";
 import { poolSrcFactoryAbi } from "@/lib/abis/pool-src-factory";
 import { srcPoolAbi } from "@/lib/abis/src-pool";
@@ -25,7 +26,7 @@ import { assets } from "@/lib/assets";
 import { LAYERZERO_ENDPOINT_CONFIG } from "@/lib/layerzero";
 import { isDerivedAccountEnabledAtom } from "@/lib/settings";
 import { ChainId } from "@/lib/types";
-import { APR_DECIMALS, LTV_DECIMALS, deriveAccountFromUid } from "@/lib/utils";
+import { APR_DECIMALS, LTV_DECIMALS, deriveAccountFromUid, padAddress } from "@/lib/utils";
 
 export const depositSchema = z.object({
   asset: z.string().min(1),
@@ -103,7 +104,11 @@ export function useDeposit(options?: UseDepositOptions) {
 
       const layerZeroDstEndpoint = LAYERZERO_ENDPOINT_CONFIG[collateralChainId as ChainId];
       const layerZeroDstEndpointAddress = layerZeroDstEndpoint.address;
-      const LayerZeroDstEndpointId = layerZeroDstEndpoint.id;
+      const layerZeroDstEndpointId = layerZeroDstEndpoint.id;
+
+      const layerZeroSrcEndpoint = LAYERZERO_ENDPOINT_CONFIG[chainId];
+      const layerZeroSrcEndpointId = layerZeroSrcEndpoint.id;
+      const layerZeroSrcEndpointAddress = layerZeroSrcEndpoint.address;
 
       const { request: deployDstPoolRequest } = await dstPublicClient.simulateContract({
         account,
@@ -114,7 +119,7 @@ export function useDeposit(options?: UseDepositOptions) {
           layerZeroDstEndpointAddress,
           userAddress,
           collateralAssetAddress as `0x${string}`,
-          LayerZeroDstEndpointId,
+          layerZeroSrcEndpointId,
         ],
       });
       const deployDstTxnHash = await dstWalletClient.writeContract(deployDstPoolRequest);
@@ -159,10 +164,9 @@ export function useDeposit(options?: UseDepositOptions) {
         variant: "default",
       });
 
-      console.log("Deployed destination pool: ", dstPoolAddress);
+      console.log("Deployed destination pool: ", dstPoolAddress, deployDstTxnHash);
 
       /* ------- Deploy Source Pool ------- */
-      const layerZeroSrcEndpoint = LAYERZERO_ENDPOINT_CONFIG[chainId].address;
       const expireDate = BigInt(Math.round(Date.now() / 1000 + 60 * 60 * 24 * daysLocked));
       const parsedLtv = parseUnits(ltv.toString(), LTV_DECIMALS);
       const parsedApr = parseUnits(interestRate.toString(), APR_DECIMALS);
@@ -189,9 +193,9 @@ export function useDeposit(options?: UseDepositOptions) {
         abi: poolSrcFactoryAbi,
         functionName: "deploySrcPool",
         args: [
-          layerZeroSrcEndpoint,
+          layerZeroSrcEndpointAddress,
           userAddress,
-          LayerZeroDstEndpointId,
+          layerZeroDstEndpointId,
           dstPoolAddress,
           loanAssetAddress as `0x${string}`,
           oracleAddress,
@@ -240,7 +244,51 @@ export function useDeposit(options?: UseDepositOptions) {
         variant: "default",
       });
 
-      console.log("Deployed source pool: ", srcPoolAddress);
+      console.log("Deployed source pool: ", srcPoolAddress, deploySrcTxnHash);
+
+      /* ------- Set Peer on Destination Pool ------- */
+      const { request: setPeerOnDst } = await dstPublicClient.simulateContract({
+        account,
+        address: dstPoolAddress,
+        abi: dstPoolAbi,
+        functionName: "setPeer",
+        args: [layerZeroSrcEndpointId, padAddress(srcPoolAddress)],
+      });
+      const setPeerOnDstTxnHash = await dstWalletClient.writeContract(setPeerOnDst);
+      await dstPublicClient.waitForTransactionReceipt({
+        hash: setPeerOnDstTxnHash,
+      });
+
+      toast({
+        title: "Set peer on destination pool",
+        description: "Successfully set peer on destination pool.",
+        action: <TransactionLinkButton chainId={chainId} txnHash={setPeerOnDstTxnHash} />,
+        variant: "default",
+      });
+
+      console.log("Set peer on destination pool: ", setPeerOnDstTxnHash);
+
+      /* ------- Set Peer on Source Pool ------- */
+      const { request: setPeerOnSrc } = await srcPublicClient.simulateContract({
+        account,
+        address: srcPoolAddress,
+        abi: srcPoolAbi,
+        functionName: "setPeer",
+        args: [layerZeroDstEndpointId, padAddress(dstPoolAddress)],
+      });
+      const setPeerOnSrcTxnHash = await srcWalletClient.writeContract(setPeerOnSrc);
+      await srcPublicClient.waitForTransactionReceipt({
+        hash: setPeerOnSrcTxnHash,
+      });
+
+      toast({
+        title: "Set peer on source pool",
+        description: "Successfully set peer on source pool.",
+        action: <TransactionLinkButton chainId={chainId} txnHash={setPeerOnSrcTxnHash} />,
+        variant: "default",
+      });
+
+      console.log("Set peer on source pool: ", setPeerOnDstTxnHash);
 
       /* ------- Approve ------- */
       const depositAsset = assets[chainId].find((a) => a.address === loanAssetAddress);

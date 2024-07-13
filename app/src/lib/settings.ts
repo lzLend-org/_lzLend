@@ -1,3 +1,3 @@
-import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 
-export const isDerivedAccountEnabledAtom = atom(false);
+export const isDerivedAccountEnabledAtom = atomWithStorage("is-derived-account-enabled", false);

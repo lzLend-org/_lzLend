@@ -1,6 +1,6 @@
 import { UseMutationOptions, useMutation } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
-import { createWalletClient, http, createPublicClient, parseUnits } from "viem";
+import { createWalletClient, http, createPublicClient, parseUnits, erc20Abi } from "viem";
 import { useAccount, useChains } from "wagmi";
 import { z } from "zod";
 
@@ -43,7 +43,12 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
       if (!collateralChain) throw Error("Chain not found");
 
       const derivedAccount = deriveAccountFromUid(address);
-      const account = isDerivedAccountEnabled ? derivedAccount : undefined;
+      const account = isDerivedAccountEnabled ? derivedAccount : address;
+      const userAddress = isDerivedAccountEnabled ? derivedAccount.address : address;
+
+      console.log("address: ", address);
+      console.log("userAddress: ", userAddress);
+      console.log("pool: ", pool);
 
       const walletClient = createWalletClient({
         account,
@@ -55,15 +60,15 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
         transport: http(),
       });
 
-      /* Borrow */
-      // const borrowAsset = assets[collateralChain.id as ChainId].find(
-      //   (a) => a.address === pool.asset.address,
-      // );
-      // if (!borrowAsset) throw Error("Borrow asset not found");
+      const dstChainId = await publicClient.readContract({
+        account,
+        address: pool.dstPoolAddress,
+        abi: dstPoolAbi,
+        functionName: "dstChainId",
+      });
+      console.log("dstChainId", dstChainId);
 
-      // const borrowAmount = parseUnits(amount.toString(), borrowAsset.decimals);
-      // const collateralAmount = (borrowAmount / pool.ltv) * BigInt(10000);
-
+      /* ------- Approve ------- */
       const collateralAsset = assets[collateralChain.id as ChainId].find(
         (a) => a.address === pool.collateralAsset.address,
       );
@@ -74,6 +79,38 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
         collateralAsset.decimals,
       );
 
+      const { request: approveRequest } = await publicClient.simulateContract({
+        account,
+        address: collateralAsset.address,
+        abi: erc20Abi,
+        functionName: "approve",
+        args: [pool.dstPoolAddress, parsedCollateralAmount],
+      });
+      const approveTxnHash = await walletClient.writeContract(approveRequest);
+      await publicClient.waitForTransactionReceipt({
+        hash: approveTxnHash,
+      });
+
+      toast({
+        title: "Approved tokens",
+        description: "Successfully approved tokens.",
+        action: (
+          <TransactionLinkButton chainId={collateralChain.id as ChainId} txnHash={approveTxnHash} />
+        ),
+        variant: "default",
+      });
+
+      console.log("Approved token: ", approveTxnHash);
+
+      /* ------- Borrow ------- */
+      // const borrowAsset = assets[collateralChain.id as ChainId].find(
+      //   (a) => a.address === pool.asset.address,
+      // );
+      // if (!borrowAsset) throw Error("Borrow asset not found");
+
+      // const borrowAmount = parseUnits(amount.toString(), borrowAsset.decimals);
+      // const collateralAmount = (borrowAmount / pool.ltv) * BigInt(10000);
+
       const { request } = await publicClient.simulateContract({
         account,
         address: pool.dstPoolAddress,
@@ -81,7 +118,15 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
         functionName: "takeLoan",
         args: [parsedCollateralAmount],
       });
-      return await walletClient.writeContract(request);
+      const txnHash = await walletClient.writeContract(request);
+
+      await publicClient.waitForTransactionReceipt({
+        hash: txnHash,
+      });
+
+      console.log("Borrowed: ", txnHash);
+
+      return txnHash;
     },
     ...options,
     onSuccess(txnHash, variables, context) {
@@ -90,25 +135,15 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
 
       toast({
         title: "Borrow Successfull!",
-        description: (
-          <p>
-            Your borrow was successfull.
-            {/* <a
-              href={getExplorerTransactionUrl(chainId, txnHash)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500"
-            >
-              Blockscout
-            </a> */}
-          </p>
-        ),
+        description: "Your borrow was successfull",
         action: <TransactionLinkButton chainId={collateralChain.id as ChainId} txnHash={txnHash} />,
         variant: "default",
       });
       options?.onSuccess?.(txnHash, variables, context);
     },
     onError(error, variables, context) {
+      console.log("Error: ", error.message);
+
       toast({
         title: "Deposit Failed!",
         description: error.message,
