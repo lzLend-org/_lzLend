@@ -4,7 +4,7 @@ import { HardhatUserConfig } from "hardhat/config"
 import "./scripts/deploy"
 import "./scripts/deployOracles"
 import "./scripts/generate"
-import "./scripts/interact"
+import "./scripts/push"
 import "./scripts/peers"
 import "hardhat-contract-sizer"
 

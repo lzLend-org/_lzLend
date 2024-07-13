@@ -35,13 +35,13 @@ contract PythOracle is OApp, OAppOptionsType3 {
     function read() public view returns (uint256[] memory) {
         uint256[] memory prices = new uint256[](priceFeedIds.length);
         for (uint i = 0; i < priceFeedIds.length; i++) {
-            PythStructs.Price memory priceStruct = pyth.getPrice(
+            PythStructs.Price memory priceStruct = pyth.getPriceUnsafe(
                 priceFeedIds[i]
             );
             int256 price = int256(priceStruct.price);
             int256 expo = int256(priceStruct.expo);
             uint256 normalizedPrice = uint256(price) *
-                (10 ** uint256(18 + expo));
+                (10 ** uint256(18 - expo));
             prices[i] = normalizedPrice;
         }
         return prices;
