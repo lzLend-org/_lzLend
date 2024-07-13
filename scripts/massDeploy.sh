@@ -25,3 +25,19 @@
 # oracle (A) -> chronicle
 # oracle (A) -> flare
 # oracle (A) -> pyth
+hh peers --contract ChronicleOracle --address "0x15e00f073322da8c03fe2dd15fae7013c0945e53" --dsteid 40275 --dstaddress "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --network scroll_sepolia
+hh peers --contract ChronicleOracle --address "0x15e00f073322da8c03fe2dd15fae7013c0945e53" --dsteid 40231 --dstaddress "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --network scroll_sepolia
+
+hh peers --contract FlareOracle --address "0x49682be434b2125eaedf0e33dbbe60e89c26fda4" --dsteid 40275 --dstaddress "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --network coston2
+hh peers --contract FlareOracle --address "0x49682be434b2125eaedf0e33dbbe60e89c26fda4" --dsteid 40231 --dstaddress "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --network coston2
+
+hh peers --contract PythOracle --address "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --dsteid 40275 --dstaddress "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --network fuji
+hh peers --contract PythOracle --address "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --dsteid 40231 --dstaddress "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --network fuji
+
+hh peers --contract Oracle --address "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --dsteid 40170 --dstaddress "0x15e00f073322da8c03fe2dd15fae7013c0945e53" --network zircuit_sepolia
+hh peers --contract Oracle --address "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --dsteid 40294 --dstaddress "0x49682be434b2125eaedf0e33dbbe60e89c26fda4" --network zircuit_sepolia
+hh peers --contract Oracle --address "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --dsteid 40106 --dstaddress "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --network zircuit_sepolia
+
+hh peers --contract Oracle --address "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --dsteid 40170 --dstaddress "0x15e00f073322da8c03fe2dd15fae7013c0945e53" --network arbitrum_sepolia
+hh peers --contract Oracle --address "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --dsteid 40294 --dstaddress "0x49682be434b2125eaedf0e33dbbe60e89c26fda4" --network arbitrum_sepolia
+hh peers --contract Oracle --address "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --dsteid 40106 --dstaddress "0xb2f38ed980c2671a01e7c33e3215cbccc40e7bf6" --network arbitrum_sepolia

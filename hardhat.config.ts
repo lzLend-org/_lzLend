@@ -5,6 +5,7 @@ import "./scripts/deploy"
 import "./scripts/deployOracles"
 import "./scripts/generate"
 import "./scripts/interact"
+import "./scripts/peers"
 import "hardhat-contract-sizer"
 
 const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
