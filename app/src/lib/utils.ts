@@ -4,8 +4,6 @@ import { twMerge } from "tailwind-merge";
 import { toHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-toHex(new Uint8Array([1, 69, 420]));
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -47,7 +45,8 @@ export function getAddressExplorerLink(address: string) {
 }
 
 export function getDaysDifference(timestamp: bigint) {
-  return Math.round((Number(timestamp) - Date.now()) / (1000 * 60 * 60 * 24));
+  const timestampInMilliseconds = Number(timestamp) * 1000;
+  return Math.round((timestampInMilliseconds - Date.now()) / (1000 * 60 * 60 * 24));
 }
 
 export function deriveAccountFromUid(uid: string) {
@@ -58,3 +57,7 @@ export function deriveAccountFromUid(uid: string) {
 
   return privateKeyToAccount(privateKey);
 }
+
+export const APR_DECIMALS = 2;
+
+export const LTV_DECIMALS = 0;

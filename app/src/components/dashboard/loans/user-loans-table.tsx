@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { formatEther } from "viem";
+import { formatUnits } from "viem";
 import { useChains } from "wagmi";
 
 import { RepayModal } from "@/components/dashboard/loans/repay-modal";
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { loans } from "@/lib/data";
 import { Loan } from "@/lib/types";
+import { APR_DECIMALS } from "@/lib/utils";
 
 export function UserLoansTable() {
   const chains = useChains();
@@ -54,13 +55,15 @@ export function UserLoansTable() {
                   {chains.find((chain) => chain.id === loan.pool.chainId)?.name}
                 </TableCell>
                 <TableCell>{loan.pool.asset.symbol}</TableCell>
-                <TableCell>{formatEther(loan.amount)}</TableCell>
-                <TableCell>{formatEther(loan.pool.apr)}</TableCell>
+                <TableCell>{formatUnits(loan.amount, loan.pool.asset.decimals)}</TableCell>
+                <TableCell>{formatUnits(loan.pool.apr, APR_DECIMALS)}%</TableCell>
                 <TableCell>
                   {chains.find((chain) => chain.id === loan.pool.collateralChainId)?.name}
                 </TableCell>
                 <TableCell>{loan.pool.collateralAsset.symbol}</TableCell>
-                <TableCell>{formatEther(loan.collateralAmount)}</TableCell>
+                <TableCell>
+                  {formatUnits(loan.collateralAmount, loan.pool.collateralAsset.decimals)}
+                </TableCell>
                 <TableCell>
                   <Button
                     size="sm"

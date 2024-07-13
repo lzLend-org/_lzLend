@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatEther } from "viem";
+import { formatUnits } from "viem";
 import { useChains } from "wagmi";
 
 import { Address } from "@/components/address";
@@ -19,7 +19,7 @@ import {
 import { pools } from "@/lib/data";
 import { usePools } from "@/lib/hooks/pools/use-pools";
 import { Pool } from "@/lib/types";
-import { getDaysDifference } from "@/lib/utils";
+import { APR_DECIMALS, LTV_DECIMALS, getDaysDifference } from "@/lib/utils";
 
 export function PoolsTable() {
   const chains = useChains();
@@ -43,10 +43,10 @@ export function PoolsTable() {
               <TableHead>Asset</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Interest Rate</TableHead>
-              <TableHead>By</TableHead>
+              <TableHead>LTV</TableHead>
               <TableHead>Locked Days</TableHead>
               <TableHead>Collateral Chain</TableHead>
-              <TableHead>LTV</TableHead>
+              <TableHead>By</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -55,16 +55,16 @@ export function PoolsTable() {
               <TableRow key={index}>
                 <TableCell>{chains.find((chain) => chain.id === pool.chainId)?.name}</TableCell>
                 <TableCell>{pool.asset.symbol}</TableCell>
-                <TableCell>{formatEther(pool.amount)}</TableCell>
-                <TableCell>{formatEther(pool.apr)}</TableCell>
-                <TableCell>
-                  <Address address={pool.owner} />
-                </TableCell>
+                <TableCell>{formatUnits(pool.amount, pool.asset.decimals)}</TableCell>
+                <TableCell>{formatUnits(pool.apr, APR_DECIMALS)}%</TableCell>
+                <TableCell>{formatUnits(pool.ltv, LTV_DECIMALS)}%</TableCell>
                 <TableCell>{getDaysDifference(pool.expireDate)} days</TableCell>
                 <TableCell>
                   {chains.find((chain) => chain.id === pool.collateralChainId)?.name}
                 </TableCell>
-                <TableCell>{formatEther(pool.ltv)}</TableCell>
+                <TableCell>
+                  <Address address={pool.owner} />
+                </TableCell>
                 <TableCell>
                   <Button
                     size="sm"
