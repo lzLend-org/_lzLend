@@ -17,7 +17,7 @@ import { deriveAccountFromUid } from "@/lib/utils";
 
 // export type RepayData = z.infer<ReturnType<typeof getRepaySchema>>;
 
-type UseRepayOptions = Omit<UseMutationOptions<string, Error, {}, unknown>, "mutationFn"> & {
+type UseRepayOptions = Omit<UseMutationOptions<string, Error, void, unknown>, "mutationFn"> & {
   loan: Loan;
 };
 

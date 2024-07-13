@@ -1,6 +1,6 @@
 // import { zodResolver } from "@hookform/resolvers/zod";
 // import { useForm } from "react-hook-form";
-import { formatEther } from "viem";
+import { formatUnits } from "viem";
 import { useChains } from "wagmi";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { BaseDialogProps, Dialog, DialogContent } from "@/components/ui/dialog";
 // import { Separator } from "@/components/ui/separator";
 import { useRepay } from "@/lib/hooks/loans/use-repay";
 import { Loan } from "@/lib/types";
+import { APR_DECIMALS } from "@/lib/utils";
 
 interface RepayModalProps extends BaseDialogProps {
   loan: Loan;
@@ -63,11 +64,11 @@ export function RepayModal({ loan, open, onOpenChange }: RepayModalProps) {
           </div>
           <div className="flex items-center justify-between">
             <div className="text-muted-foreground">Amount</div>
-            <div className="font-medium">{formatEther(loan.amount)}</div>
+            <div className="font-medium">{formatUnits(loan.amount, loan.pool.asset.decimals)}</div>
           </div>
           <div className="flex items-center justify-between">
             <div className="text-muted-foreground">Interest Rate</div>
-            <div className="font-medium">{formatEther(loan.pool.apr)}</div>
+            <div className="font-medium">{formatUnits(loan.pool.apr, APR_DECIMALS)}%</div>
           </div>
           {/* <Separator className="my-3" /> */}
 
