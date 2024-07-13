@@ -11,6 +11,7 @@
   "dependencies": {
     "@dynamic-labs/ethereum": "^2.3.0",
     "@dynamic-labs/sdk-react-core": "^2.3.0",
+    "@dynamic-labs/types": "^2.3.0",
     "@dynamic-labs/wagmi-connector": "^2.3.0",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-dialog": "^1.1.1",

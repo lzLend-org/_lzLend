@@ -1,10 +1,11 @@
 "use client";
 
-import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+// import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Link from "next/link";
 
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { WalletStatus } from "@/components/wallet/wallet-status";
 
 export function Header() {
   return (
@@ -33,8 +34,8 @@ export function Header() {
           </Link>
         </nav>
         <ThemeToggle />
-        <DynamicWidget innerButtonComponent={<>Login</>} />
-        {/* <WalletStatus /> */}
+        {/* <DynamicWidget innerButtonComponent={<>Login</>} /> */}
+        <WalletStatus />
         {/* <ChainSwitch /> */}
       </div>
     </header>
