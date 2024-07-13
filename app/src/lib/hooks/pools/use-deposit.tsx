@@ -8,7 +8,6 @@ import {
   decodeEventLog,
   parseUnits,
 } from "viem";
-import { getTransactionReceipt } from "viem/actions";
 import { useAccount, useChainId, useChains } from "wagmi";
 import { z } from "zod";
 
@@ -49,6 +48,9 @@ export function useDeposit(options?: UseDepositOptions) {
   const chainId = useChainId();
   const chains = useChains();
   const { address } = useAccount();
+  // const {} = createWalletClient({
+  //   account
+  // });
 
   const isDerivedAccountEnabled = useAtomValue(isDerivedAccountEnabledAtom);
 
@@ -69,13 +71,17 @@ export function useDeposit(options?: UseDepositOptions) {
       if (!srcChain) throw Error("Chain not found");
 
       const derivedAccount = deriveAccountFromUid(address);
-      const account = isDerivedAccountEnabled ? derivedAccount : undefined;
+      const account = isDerivedAccountEnabled ? derivedAccount : address;
+      const userAddress = isDerivedAccountEnabled ? derivedAccount.address : address;
+
+      console.log("Account: ", account);
 
       const srcWalletClient = createWalletClient({
         account,
         chain: srcChain,
         transport: http(),
       });
+
       const srcPublicClient = createPublicClient({
         chain: srcChain,
         transport: http(),
@@ -98,7 +104,6 @@ export function useDeposit(options?: UseDepositOptions) {
       const layerZeroDstEndpoint = LAYERZERO_ENDPOINT_CONFIG[collateralChainId as ChainId];
       const layerZeroDstEndpointAddress = layerZeroDstEndpoint.address;
       const LayerZeroDstEndpointId = layerZeroDstEndpoint.id;
-      const delegate = account?.address || address;
 
       const { request: deployDstPoolRequest } = await dstPublicClient.simulateContract({
         account,
@@ -107,32 +112,45 @@ export function useDeposit(options?: UseDepositOptions) {
         functionName: "deployDstPool",
         args: [
           layerZeroDstEndpointAddress,
-          delegate,
+          userAddress,
           collateralAssetAddress as `0x${string}`,
           LayerZeroDstEndpointId,
         ],
       });
       const deployDstTxnHash = await dstWalletClient.writeContract(deployDstPoolRequest);
-      const receipt = await getTransactionReceipt(dstPublicClient, {
+      const deployDstReceipt = await dstPublicClient.waitForTransactionReceipt({
         hash: deployDstTxnHash,
       });
 
-      let dstPoolAddress: `0x${string}` | undefined = undefined;
+      const deployDstLog = deployDstReceipt.logs[2];
+      const deployDstEvent = decodeEventLog({
+        data: deployDstLog.data,
+        topics: deployDstLog.topics,
+        abi: poolDstFactoryAbi,
+        eventName: "DeployedDstPool",
+      });
+      const dstPoolAddress = deployDstEvent.args.dstPoolAddress;
 
-      for (let i = 0; i < receipt.logs.length; i++) {
-        const log = receipt.logs[i];
-        const event = decodeEventLog({
-          data: log.data,
-          topics: log.topics,
-          abi: poolDstFactoryAbi,
-        });
-        if (event.eventName === "DeployedDstPool") {
-          dstPoolAddress = event.args.dstPoolAddress;
-          break;
-        }
-      }
+      // let dstPoolAddress: `0x${string}` | undefined = undefined;
+      //
+      // for (let i = 1; i < deployDstReceipt.logs.length; i++) {
+      //   const log = deployDstReceipt.logs[i];
+      //   console.log("Log: ", log);
 
-      if (!dstPoolAddress) throw Error("Destination pool address not found");
+      //   const event = decodeEventLog({
+      //     data: log.data,
+      //     topics: log.topics,
+      //     abi: poolDstFactoryAbi,
+      //     eventName: "DeployedDstPool",
+      //   });
+
+      //   if (event.eventName === "DeployedDstPool") {
+      //     dstPoolAddress = event.args.dstPoolAddress;
+      //     break;
+      //   }
+      // }
+      //
+      // if (!dstPoolAddress) throw Error("Destination pool address not found");
 
       toast({
         title: "Deployed destination pool",
@@ -141,9 +159,11 @@ export function useDeposit(options?: UseDepositOptions) {
         variant: "default",
       });
 
+      console.log("Deployed destination pool: ", dstPoolAddress);
+
       /* ------- Deploy Source Pool ------- */
       const layerZeroSrcEndpoint = LAYERZERO_ENDPOINT_CONFIG[chainId].address;
-      const expireDate = BigInt(Date.now() / 1000 + 60 * 60 * 24 * daysLocked);
+      const expireDate = BigInt(Math.round(Date.now() / 1000 + 60 * 60 * 24 * daysLocked));
       const parsedLtv = parseUnits(ltv.toString(), LTV_DECIMALS);
       const parsedApr = parseUnits(interestRate.toString(), APR_DECIMALS);
       const oracleAddress = ORACLE_ADDRESS[chainId];
@@ -168,7 +188,7 @@ export function useDeposit(options?: UseDepositOptions) {
         functionName: "deploySrcPool",
         args: [
           layerZeroSrcEndpoint,
-          delegate,
+          userAddress,
           LayerZeroDstEndpointId,
           dstPoolAddress,
           loanAssetAddress as `0x${string}`,
@@ -181,23 +201,35 @@ export function useDeposit(options?: UseDepositOptions) {
         ],
       });
       const deploySrcTxnHash = await srcWalletClient.writeContract(deploySrcPoolRequest);
+      const deploySrcReceipt = await srcPublicClient.waitForTransactionReceipt({
+        hash: deploySrcTxnHash,
+      });
 
-      let srcPoolAddress: `0x${string}` | undefined = undefined;
+      const deploySrcLog = deploySrcReceipt.logs[2];
+      const deploySrcEvent = decodeEventLog({
+        data: deploySrcLog.data,
+        topics: deploySrcLog.topics,
+        abi: poolSrcFactoryAbi,
+        eventName: "DeployedSrcPool",
+      });
+      const srcPoolAddress = deploySrcEvent.args.srcPoolAddress;
 
-      for (let i = 0; i < receipt.logs.length; i++) {
-        const log = receipt.logs[i];
-        const event = decodeEventLog({
-          data: log.data,
-          topics: log.topics,
-          abi: poolSrcFactoryAbi,
-        });
-        if (event.eventName === "DeployedSrcPool") {
-          dstPoolAddress = event.args.srcPoolAddress;
-          break;
-        }
-      }
+      // let srcPoolAddress: `0x${string}` | undefined = undefined;
 
-      if (!srcPoolAddress) throw Error("Source pool address not found");
+      // for (let i = 0; i < deploySrcReceipt.logs.length; i++) {
+      //   const log = deploySrcReceipt.logs[i];
+      //   const event = decodeEventLog({
+      //     data: log.data,
+      //     topics: log.topics,
+      //     abi: poolSrcFactoryAbi,
+      //   });
+      //   if (event.eventName === "DeployedSrcPool") {
+      //     srcPoolAddress = event.args.srcPoolAddress;
+      //     break;
+      //   }
+      // }
+
+      // if (!srcPoolAddress) throw Error("Source pool address not found");
 
       toast({
         title: "Deployed source pool",
@@ -206,8 +238,10 @@ export function useDeposit(options?: UseDepositOptions) {
         variant: "default",
       });
 
+      console.log("Deployed source pool: ", srcPoolAddress);
+
       /* ------- Approve ------- */
-      const depositAsset = assets[chainId].find((a) => a.symbol === loanAssetAddress);
+      const depositAsset = assets[chainId].find((a) => a.address === loanAssetAddress);
       if (!depositAsset) throw Error("Deposit asset not found");
 
       const depositAmount = parseUnits(amount.toString(), depositAsset.decimals);
@@ -219,6 +253,9 @@ export function useDeposit(options?: UseDepositOptions) {
         args: [srcPoolAddress, depositAmount],
       });
       const approveTxnHash = await srcWalletClient.writeContract(approveRequest);
+      await srcPublicClient.waitForTransactionReceipt({
+        hash: approveTxnHash,
+      });
 
       toast({
         title: "Approved tokens",
@@ -226,6 +263,8 @@ export function useDeposit(options?: UseDepositOptions) {
         action: <TransactionLinkButton chainId={chainId} txnHash={approveTxnHash} />,
         variant: "default",
       });
+
+      console.log("Approved token: ", approveTxnHash);
 
       /* ------- Deposit -------*/
       const { request: depositRequest } = await srcPublicClient.simulateContract({
@@ -235,30 +274,26 @@ export function useDeposit(options?: UseDepositOptions) {
         functionName: "deposit",
         args: [depositAmount],
       });
-      return await srcWalletClient.writeContract(depositRequest);
-    },
-    onSuccess(txnHash, variables, context) {
+      const depositTxnHash = await srcWalletClient.writeContract(depositRequest);
+      await srcPublicClient.waitForTransactionReceipt({
+        hash: depositTxnHash,
+      });
+
       toast({
         title: "Deposit Successfull!",
-        description: (
-          <p>
-            Your deposit was successfull.
-            {/* <a
-              href={getExplorerTransactionUrl(chainId, txnHash)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500"
-            >
-              Blockscout
-            </a> */}
-          </p>
-        ),
-        action: <TransactionLinkButton chainId={chainId} txnHash={txnHash} />,
+        description: "Your deposit was successfull",
+        action: <TransactionLinkButton chainId={chainId} txnHash={depositTxnHash} />,
         variant: "default",
       });
+
+      return depositTxnHash;
+    },
+    onSuccess(txnHash, variables, context) {
       options?.onSuccess?.(txnHash, variables, context);
     },
     onError(error, variables, context) {
+      console.log("Error: ", error.message);
+
       toast({
         title: "Deposit Failed!",
         description: error.message,

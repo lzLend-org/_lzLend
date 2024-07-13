@@ -55,6 +55,8 @@ export function deriveAccountFromUid(uid: string) {
   const buffer = Buffer.from(hashedString, "hex");
   const privateKey = toHex(buffer);
 
+  console.log("Private Key: ", privateKey);
+
   return privateKeyToAccount(privateKey);
 }
 

@@ -5,7 +5,7 @@ import {
   morphHolesky,
   scrollSepolia,
   sepolia,
-  // zircuitTestnet,
+  zircuitTestnet,
 } from "viem/chains";
 
 import { ChainId } from "@/lib/types";
@@ -17,7 +17,7 @@ export const EXPLORER_URL: Record<ChainId, string> = {
   [baseSepolia.id]: "https://base-sepolia.blockscout.com",
   [scrollSepolia.id]: "https://sepolia.scrollscan.com",
   [morphHolesky.id]: "https://explorer-testnet.morphl2.io/",
-  // [zircuitTestnet.id]: "https://explorer.zircuit.com/",
+  [zircuitTestnet.id]: "https://explorer.zircuit.com/",
 };
 
 export function getExplorerAddressUrl(chainId: ChainId, address: string) {

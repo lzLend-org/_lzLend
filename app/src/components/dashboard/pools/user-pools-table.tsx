@@ -65,7 +65,7 @@ export function UserPoolsTable() {
                   {chains.find((chain) => chain.id === pool.collateralChainId)?.name}
                 </TableCell>
                 <TableCell>
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="accent">
                     List for Sale
                   </Button>
                 </TableCell>

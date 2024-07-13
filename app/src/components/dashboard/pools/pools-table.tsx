@@ -68,7 +68,7 @@ export function PoolsTable() {
                 <TableCell>
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="accent"
                     onClick={() => {
                       setIsModalOpen(true);
                       setSelectedPool(pool);
