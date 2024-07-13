@@ -5,6 +5,7 @@ import {
   morphHolesky,
   scrollSepolia,
   sepolia,
+  // zircuitTestnet,
 } from "viem/chains";
 
 import { Asset, ChainId } from "@/lib/types";
@@ -30,4 +31,5 @@ export const assets: Record<ChainId, Asset[]> = {
   [baseSepolia.id]: [ETH, USDC],
   [scrollSepolia.id]: [ETH, USDC],
   [morphHolesky.id]: [ETH, USDC],
+  // [zircuitTestnet.id]: [ETH, USDC],
 };

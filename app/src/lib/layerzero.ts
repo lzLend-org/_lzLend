@@ -5,6 +5,7 @@ import {
   morphHolesky,
   scrollSepolia,
   sepolia,
+  // zircuitTestnet,
 } from "viem/chains";
 
 import { ChainId } from "@/lib/types";
@@ -40,4 +41,8 @@ export const LAYERZERO_ENDPOINT_CONFIG: Record<
     id: 40290,
     address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
   },
+  // [zircuitTestnet.id]: {
+  //   id: 40275,
+  //   address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+  // },
 };

@@ -13,16 +13,16 @@ import { config } from "@/lib/wagmi";
 
 const queryClient = new QueryClient();
 
-const cssOverrides = `  
-.dynamic-shadow-dom {
-  --dynamic-font-family-primary: "General Sans", sans-serif;
-  --dynamic-connect-button-background-hover: #eee !important;
-}
+// const cssOverrides = `
+// .dynamic-shadow-dom {
+//   --dynamic-font-family-primary: "General Sans", sans-serif;
+//   --dynamic-connect-button-background-hover: #eee !important;
+// }
 
-button {
-  height: 40px;
-}
-`;
+// button {
+//   height: 40px;
+// }
+// `;
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
@@ -31,7 +31,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         settings={{
           environmentId: env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID,
           walletConnectors: [EthereumWalletConnectors],
-          cssOverrides,
+          // cssOverrides,
         }}
       >
         <WagmiProvider config={config}>
