@@ -244,32 +244,6 @@ export const srcPoolAbi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "apr",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "collateralToken",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "uint256",
@@ -280,19 +254,6 @@ export const srcPoolAbi = [
     name: "deposit",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "dstChainId",
-    outputs: [
-      {
-        internalType: "uint32",
-        name: "",
-        type: "uint32",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
@@ -310,12 +271,54 @@ export const srcPoolAbi = [
   },
   {
     inputs: [],
-    name: "expiry",
+    name: "getPoolMetadata",
     outputs: [
       {
-        internalType: "uint256",
+        components: [
+          {
+            internalType: "uint32",
+            name: "dstChainId",
+            type: "uint32",
+          },
+          {
+            internalType: "address",
+            name: "poolOwner",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "poolBalance",
+            type: "uint256",
+          },
+          {
+            internalType: "address",
+            name: "poolToken",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "collateralToken",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "ltv",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "apr",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "expiry",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct SrcPool.PoolMetadata",
         name: "",
-        type: "uint256",
+        type: "tuple",
       },
     ],
     stateMutability: "view",
@@ -415,19 +418,6 @@ export const srcPoolAbi = [
         internalType: "address",
         name: "borrower",
         type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "ltv",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -559,25 +549,47 @@ export const srcPoolAbi = [
   },
   {
     inputs: [],
-    name: "poolBalance",
+    name: "poolMetadata",
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        internalType: "uint32",
+        name: "dstChainId",
+        type: "uint32",
       },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "poolToken",
-    outputs: [
       {
         internalType: "address",
-        name: "",
+        name: "poolOwner",
         type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "poolBalance",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "poolToken",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "collateralToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "ltv",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "apr",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "expiry",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

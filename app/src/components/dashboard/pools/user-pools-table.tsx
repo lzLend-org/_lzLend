@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { formatEther } from "viem";
 import { mainnet } from "viem/chains";
-import { useChains } from "wagmi";
+import { useAccount, useChains } from "wagmi";
 
-import { NewDepositModal } from "@/components/dashboard/deposits/new-deposit-modal";
+import { NewDepositModal } from "@/components/dashboard/pools/new-deposit-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -16,64 +17,82 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { ETH, USDC } from "@/lib/assets";
-import { Deposit } from "@/lib/types";
+import { usePools } from "@/lib/hooks/pools/use-pools";
+import { Pool } from "@/lib/types";
 import { getDaysDifference } from "@/lib/utils";
 
-const deposits: Deposit[] = [
+const pools: Pool[] = [
   {
-    chain: mainnet.id,
+    chainId: mainnet.id,
     asset: ETH,
-    amount: 1.5,
+    amount: BigInt(100000000000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    interestRate: "2%",
-    unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
+    apr: BigInt(2),
+    expireDate: BigInt(Date.now() + 1000 * 60 * 60 * 24 * 30),
     collateralChainId: mainnet.id,
-    ltv: 0.5,
+    collateralAsset: USDC,
+    ltv: BigInt(5),
   },
   {
-    chain: mainnet.id,
+    chainId: mainnet.id,
     asset: USDC,
-    amount: 0.5,
+    amount: BigInt(100000000000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    interestRate: "3%",
-    unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 60,
+    address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
+    apr: BigInt(2),
+    expireDate: BigInt(Date.now() + 1000 * 60 * 60 * 24 * 30),
     collateralChainId: mainnet.id,
-    ltv: 0.5,
+    collateralAsset: USDC,
+    ltv: BigInt(5),
   },
   {
-    chain: mainnet.id,
+    chainId: mainnet.id,
     asset: USDC,
-    amount: 2.5,
+    amount: BigInt(100000000000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    interestRate: "5.2%",
-    unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 80,
+    address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
+    apr: BigInt(2),
+    expireDate: BigInt(Date.now() + 1000 * 60 * 60 * 24 * 30),
     collateralChainId: mainnet.id,
-    ltv: 0.5,
+    collateralAsset: USDC,
+    ltv: BigInt(5),
   },
   {
-    chain: mainnet.id,
+    chainId: mainnet.id,
     asset: USDC,
-    amount: 0.5,
+    amount: BigInt(100000000000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    interestRate: "4.8%",
-    unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
+    apr: BigInt(2),
+    expireDate: BigInt(Date.now() + 1000 * 60 * 60 * 24 * 30),
     collateralChainId: mainnet.id,
-    ltv: 0.5,
+    collateralAsset: USDC,
+    ltv: BigInt(5),
   },
   {
-    chain: mainnet.id,
+    chainId: mainnet.id,
     asset: USDC,
-    amount: 5000,
+    amount: BigInt(100000000000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
-    interestRate: "3.2%",
-    unlockDate: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
+    apr: BigInt(2),
+    expireDate: BigInt(Date.now() + 1000 * 60 * 60 * 24 * 30),
     collateralChainId: mainnet.id,
-    ltv: 0.5,
+    collateralAsset: USDC,
+    ltv: BigInt(5),
   },
 ];
 
-export function DepositsTable() {
+export function UserPoolsTable() {
+  const { address } = useAccount();
   const chains = useChains();
+  const { data } = usePools({
+    owner: address,
+    enabled: !!address,
+  });
+
+  console.log("User Pools: ", data);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -99,25 +118,25 @@ export function DepositsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {deposits.map((deposit, index) => (
+            {pools.map((pool, index) => (
               <TableRow key={index}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <span>{chains.find((chain) => chain.id === deposit.chain)?.name}</span>
+                    <span>{chains.find((chain) => chain.id === pool.chainId)?.name}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <span>{deposit.asset.symbol}</span>
+                    <span>{pool.asset.symbol}</span>
                   </div>
                 </TableCell>
-                <TableCell>{deposit.amount}</TableCell>
-                <TableCell>{deposit.interestRate}</TableCell>
-                <TableCell>{getDaysDifference(deposit.unlockDate)} days</TableCell>
+                <TableCell>{formatEther(pool.amount)}</TableCell>
+                <TableCell>{formatEther(pool.apr)}</TableCell>
+                <TableCell>{getDaysDifference(pool.expireDate)} days</TableCell>
                 <TableCell>
-                  {chains.find((chain) => chain.id === deposit.collateralChainId)?.name}
+                  {chains.find((chain) => chain.id === pool.collateralChainId)?.name}
                 </TableCell>
-                <TableCell>{deposit.ltv}</TableCell>
+                <TableCell>{formatEther(pool.ltv)}</TableCell>
                 <TableCell>
                   <Button size="sm" variant="outline">
                     List for Sale
