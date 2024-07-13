@@ -26,21 +26,22 @@ contract FlareOracle {
     /**
      * Get the current value of the feeds.
      */
-    function read()
-        external
-        view
-        returns (
-            uint256[] memory _feedValues,
-            int8[] memory _decimals,
-            uint64 _timestamp
-        )
-    {
-        (
-            uint256[] memory feedValues,
-            int8[] memory decimals,
-            uint64 timestamp
-        ) = ftsoV2.fetchCurrentFeeds(feedIndexes);
-        /* Your custom feed consumption logic. In this example the values are just returned. */
-        return (feedValues, decimals, timestamp);
+    function read() external view returns (uint256[] memory _feedValues) {
+        (uint256[] memory feedValues, int8[] memory decimals, ) = ftsoV2
+            .fetchCurrentFeeds(feedIndexes);
+
+        for (uint256 i = 0; i < feedValues.length; i++) {
+            if (decimals[i] < 18) {
+                feedValues[i] =
+                    feedValues[i] *
+                    (10 ** (18 - uint8(decimals[i])));
+            } else if (decimals[i] > 18) {
+                feedValues[i] =
+                    feedValues[i] /
+                    (10 ** (uint8(decimals[i]) - 18));
+            }
+        }
+
+        return feedValues;
     }
 }
