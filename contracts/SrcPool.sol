@@ -5,6 +5,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {OApp, MessagingFee, Origin} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OApp.sol";
 import {MessagingReceipt} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OAppSender.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IOracle} from "./interfaces/oracles/IOracle.sol";
 
 contract SrcPool is OApp {
     struct PoolMetadata {
@@ -13,6 +14,8 @@ contract SrcPool is OApp {
         address poolOwner;
         uint256 poolBalance;
         address poolToken;
+        address oracleAddress;
+        uint256[] oraclePricesIndex;
         address collateralToken;
         uint256 ltv;
         uint256 apr;
@@ -36,6 +39,8 @@ contract SrcPool is OApp {
         uint32 _dstChainId,
         address _dstPoolAddress,
         address _poolToken,
+        address _oracleAddress,
+        uint256[] memory _oraclePricesIndex,
         address _collateralToken,
         uint256 _ltv,
         uint256 _apr,
@@ -45,6 +50,8 @@ contract SrcPool is OApp {
         poolMetadata.dstPoolAddress = _dstPoolAddress;
         poolMetadata.poolOwner = _delegate;
         poolMetadata.poolToken = _poolToken;
+        poolMetadata.oracleAddress = _oracleAddress;
+        poolMetadata.oraclePricesIndex = _oraclePricesIndex;
         poolMetadata.collateralToken = _collateralToken;
         poolMetadata.ltv = _ltv;
         poolMetadata.apr = _apr;
@@ -110,8 +117,10 @@ contract SrcPool is OApp {
         Loan storage loan = loans[_sender];
         require(loan.amount > 0, "Pool: no loan to repay");
 
-        uint256 interest = (((loan.amount * poolMetadata.apr) / 10000) *
-            (block.timestamp - loan.startTime)) / (365 days * 100);
+        uint256 interest = (loan.amount *
+            poolMetadata.apr *
+            (block.timestamp - loan.startTime)) / (10000 * 365 days);
+
         return loan.amount + interest;
     }
 
@@ -122,14 +131,21 @@ contract SrcPool is OApp {
         address /*_executor*/,
         bytes calldata /*_extraData*/
     ) internal override {
-        // NOTE: TAKE OUT A LOAN
         (address borrower, uint256 collateral) = abi.decode(
             payload,
             (address, uint256)
         );
-        // TODO: INSERT ORACLES HERE...
-        // TODO: LOGIC HERE IS WRONG...
-        uint256 loanAmount = (collateral * poolMetadata.ltv) / 100;
+
+        uint256 poolPrice = IOracle(poolMetadata.oracleAddress).getPrice(
+            poolMetadata.oraclePricesIndex[0]
+        );
+        uint256 debtPrice = IOracle(poolMetadata.oracleAddress).getPrice(
+            poolMetadata.oraclePricesIndex[1]
+        );
+
+        uint256 loanAmount = (collateral * debtPrice * poolMetadata.ltv) /
+            (poolPrice * 10000);
+
         require(
             poolMetadata.poolBalance >= loanAmount,
             "Pool: insufficient balance"
@@ -142,7 +158,6 @@ contract SrcPool is OApp {
         );
         poolMetadata.poolBalance -= loanAmount;
 
-        // IERC20(poolToken).approve(address(this), loanAmount);
         IERC20(poolMetadata.poolToken).transferFrom(
             address(this),
             borrower,
