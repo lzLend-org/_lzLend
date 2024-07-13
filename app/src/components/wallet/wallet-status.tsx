@@ -1,25 +1,43 @@
 "use client";
 
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
+import { useConnect, useConnectors } from "wagmi";
 
 import { Button } from "@/components/ui/button";
-import { WalletDropdownMenu } from "@/components/wallet/wallet-dropdown";
+// import { WalletDropdownMenu } from "@/components/wallet/wallet-dropdown";
 
 export const WalletStatus = () => {
-  const { address } = useAccount();
+  // const { address, isConnected } = useAccount();
+
+  const connectors = useConnectors();
+  const { connect } = useConnect();
+
+  console.log("connectors: ", connectors);
+
+  // return (
+  //   <ConnectButton.Custom>
+  //     {({ account, chain, openConnectModal }) => {
+  //       const connected = account && chain;
+
+  //       if (connected && address) {
+  //         return <WalletDropdownMenu address={address} />;
+  //       }
+
+  //       return <Button onClick={openConnectModal}>Connect Wallet</Button>;
+  //     }}
+  //   </ConnectButton.Custom>
+  // );
 
   return (
-    <ConnectButton.Custom>
-      {({ account, chain, openConnectModal }) => {
-        const connected = account && chain;
-
-        if (connected && address) {
-          return <WalletDropdownMenu address={address} />;
+    <div>
+      <Button
+        onClick={() =>
+          connect({
+            connector: connectors[0],
+          })
         }
-
-        return <Button onClick={openConnectModal}>Connect Wallet</Button>;
-      }}
-    </ConnectButton.Custom>
+      >
+        Connect
+      </Button>
+    </div>
   );
 };
