@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { formatEther } from "viem";
 // import { useChainId } from "wagmi";
+import { formatUnits } from "viem";
 import { useChains } from "wagmi";
 
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 // import { assets } from "@/lib/assets";
 import { BorrowData, getBorrowSchema, useBorrow } from "@/lib/hooks/loans/use-borrow";
 import { Pool } from "@/lib/types";
+import { APR_DECIMALS, LTV_DECIMALS } from "@/lib/utils";
 
 interface BorrowModalProps extends BaseDialogProps {
   pool: Pool;
@@ -26,7 +27,7 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
   const form = useForm<BorrowData>({
     resolver: zodResolver(getBorrowSchema(Number(pool.amount))),
     defaultValues: {
-      amount: 0,
+      collateralAmount: 0,
       // collateralAsset: chainAssets[0].address,
     },
   });
@@ -35,7 +36,9 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = form;
+  const collateralAmount = watch("collateralAmount");
 
   const { mutate: borrow } = useBorrow({
     pool,
@@ -71,7 +74,11 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
             </div>
             <div className="flex items-center justify-between">
               <div className="text-muted-foreground">Interest Rate</div>
-              <div className="font-medium">{formatEther(pool.apr)}</div>
+              <div className="font-medium">{formatUnits(pool.apr, APR_DECIMALS)}%</div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="text-muted-foreground">LTV</div>
+              <div className="font-medium">{formatUnits(pool.ltv, LTV_DECIMALS)}%</div>
             </div>
             <div className="flex items-center justify-between">
               <div className="text-muted-foreground">Collateral Chain</div>
@@ -87,7 +94,7 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
 
             <div>
               <Label className="mb-2 block" htmlFor="name">
-                Amount
+                Collateral Amount
               </Label>
               <Input
                 id="name"
@@ -98,11 +105,17 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
                 tabIndex={-1}
                 step={0.01}
                 // disabled={isPending}
-                {...register("amount", { valueAsNumber: true })}
+                {...register("collateralAmount", { valueAsNumber: true })}
               />
-              {errors?.amount && (
-                <p className="px-1 text-xs text-destructive">{errors.amount.message}</p>
+              {errors?.collateralAmount && (
+                <p className="px-1 text-xs text-destructive">{errors.collateralAmount.message}</p>
               )}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="text-muted-foreground">Borrow Amount</div>
+              <div className="font-medium">{collateralAmount * 2}</div>
+              {/* TODO: Calculate borrow amount based on collateral amount */}
             </div>
 
             {/* <FormField

@@ -1,4 +1,12 @@
-import { mainnet, sepolia } from "viem/chains";
+import {
+  arbitrumSepolia,
+  baseSepolia,
+  mainnet,
+  morphHolesky,
+  scrollSepolia,
+  sepolia,
+  // zircuitTestnet,
+} from "viem/chains";
 
 import { ChainId } from "@/lib/types";
 
@@ -17,4 +25,24 @@ export const LAYERZERO_ENDPOINT_CONFIG: Record<
     id: 40161,
     address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
   },
+  [arbitrumSepolia.id]: {
+    id: 40231,
+    address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+  },
+  [baseSepolia.id]: {
+    id: 40245,
+    address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+  },
+  [scrollSepolia.id]: {
+    id: 40170,
+    address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+  },
+  [morphHolesky.id]: {
+    id: 40290,
+    address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+  },
+  // [zircuitTestnet.id]: {
+  //   id: 40275,
+  //   address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+  // },
 };

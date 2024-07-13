@@ -35,9 +35,9 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
     resolver: zodResolver(depositSchema),
     defaultValues: {
       asset: chainAssets[0].address,
-      amount: 0,
-      ltv: 0,
-      interestRate: 0,
+      amount: 1,
+      ltv: 50,
+      interestRate: 5,
       daysLocked: 30,
       collateralChainId: chains[0].id,
     },
@@ -207,7 +207,7 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
               render={({ field }) => (
                 <FormItem className="space-y-0">
                   <FormLabel className="mb-2 block">Collateral Asset</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={chainAssets[0].address}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select an asset" />

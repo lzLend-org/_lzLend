@@ -18,6 +18,11 @@ export const srcPoolAbi = [
       },
       {
         internalType: "address",
+        name: "_dstPoolAddress",
+        type: "address",
+      },
+      {
+        internalType: "address",
         name: "_poolToken",
         type: "address",
       },
@@ -279,6 +284,11 @@ export const srcPoolAbi = [
             internalType: "uint32",
             name: "dstChainId",
             type: "uint32",
+          },
+          {
+            internalType: "address",
+            name: "dstPoolAddress",
+            type: "address",
           },
           {
             internalType: "address",
@@ -555,6 +565,11 @@ export const srcPoolAbi = [
         internalType: "uint32",
         name: "dstChainId",
         type: "uint32",
+      },
+      {
+        internalType: "address",
+        name: "dstPoolAddress",
+        type: "address",
       },
       {
         internalType: "address",
