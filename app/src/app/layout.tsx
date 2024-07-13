@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 
 import Providers from "@/app/providers";
 import { Header } from "@/components/layout/header";
+import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 
 import type { Metadata } from "next";
@@ -32,6 +33,7 @@ export default function RootLayout({
             <Header />
             <main className="container flex-1 pb-20">{children}</main>
           </div>
+          <Toaster />
         </Providers>
       </body>
     </html>

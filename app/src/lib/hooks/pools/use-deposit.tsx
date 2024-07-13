@@ -1,10 +1,12 @@
-import { useMutation } from "@tanstack/react-query";
+import { UseMutationOptions, useMutation } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { createWalletClient, http, erc20Abi, createPublicClient, decodeEventLog } from "viem";
 import { getTransactionReceipt } from "viem/actions";
 import { useAccount, useChainId, useChains } from "wagmi";
 import { z } from "zod";
 
+import { TransactionLinkButton } from "@/components/transaction-link-button";
+import { toast } from "@/components/ui/use-toast";
 import { poolFactoryAbi } from "@/lib/abis/pool-factory";
 import { srcPoolAbi } from "@/lib/abis/src-pool";
 import { POOL_FACTORY_ADDRESS } from "@/lib/addresses";
@@ -20,12 +22,17 @@ export const depositSchema = z.object({
   daysLocked: z.number().gt(0),
   collateralChainId: z.number().gt(0),
   collateralAsset: z.string().min(1),
-  ltv: z.number().gt(0).max(1),
+  ltv: z.number().gt(0).max(100),
 });
 
 export type DepositData = z.infer<typeof depositSchema>;
 
-export function useDeposit() {
+type UseDepositOptions = Omit<
+  UseMutationOptions<string, Error, DepositData, unknown>,
+  "mutationFn"
+>;
+
+export function useDeposit(options?: UseDepositOptions) {
   const chainId = useChainId();
   const chains = useChains();
   const { address } = useAccount();
@@ -42,6 +49,7 @@ export function useDeposit() {
       interestRate,
       daysLocked,
     }: DepositData) => {
+      // return "0xd368d878588a0ff60ce504d22b09c3fc7864ce678b6927d696606062637964b3";
       if (!address) throw Error("Address not found");
 
       const srcChain = chains.find((chain) => chain.id === chainId);
@@ -81,7 +89,14 @@ export function useDeposit() {
           expireDate,
         ],
       });
-      await srcWalletClient.writeContract(deploySrcPoolRequest);
+      const deploySrcTxnHash = await srcWalletClient.writeContract(deploySrcPoolRequest);
+
+      toast({
+        title: "Deployed source pool",
+        description: "Successfully deployed source pool.",
+        action: <TransactionLinkButton chainId={chainId} txnHash={deploySrcTxnHash} />,
+        variant: "default",
+      });
 
       /* Deploy Destination Pool */
       const dstChain = chains.find((chain) => chain.id === collateralChainId);
@@ -106,9 +121,9 @@ export function useDeposit() {
         functionName: "deployDstPool",
         args: [layerZeroDstEndpoint, delegate, collateralAsset as `0x${string}`, collateralChainId],
       });
-      const txnHash = await dstWalletClient.writeContract(deployDstPoolRequest);
+      const deployDstTxnHash = await dstWalletClient.writeContract(deployDstPoolRequest);
       const receipt = await getTransactionReceipt(dstPublicClient, {
-        hash: txnHash,
+        hash: deployDstTxnHash,
       });
 
       const log = receipt.logs[0];
@@ -121,6 +136,13 @@ export function useDeposit() {
       // @ts-ignore
       const srcPoolAddress = event.args.srcPoolAddress;
 
+      toast({
+        title: "Deployed destination pool",
+        description: "Successfully deployed destination pool.",
+        action: <TransactionLinkButton chainId={chainId} txnHash={deployDstTxnHash} />,
+        variant: "default",
+      });
+
       /* Approve */
       const { request: approveRequest } = await srcPublicClient.simulateContract({
         account,
@@ -129,7 +151,14 @@ export function useDeposit() {
         functionName: "approve",
         args: [srcPoolAddress, BigInt(amount)],
       });
-      await srcWalletClient.writeContract(approveRequest);
+      const approveTxnHash = await srcWalletClient.writeContract(approveRequest);
+
+      toast({
+        title: "Approved tokens",
+        description: "Successfully approved tokens.",
+        action: <TransactionLinkButton chainId={chainId} txnHash={approveTxnHash} />,
+        variant: "default",
+      });
 
       /* Deposit */
       const { request: depositRequest } = await srcPublicClient.simulateContract({
@@ -139,7 +168,37 @@ export function useDeposit() {
         functionName: "deposit",
         args: [BigInt(amount)],
       });
-      await srcWalletClient.writeContract(depositRequest);
+      return await srcWalletClient.writeContract(depositRequest);
     },
+    onSuccess(txnHash, variables, context) {
+      toast({
+        title: "Deposit Successfull!",
+        description: (
+          <p>
+            Your deposit was successfull.
+            {/* <a
+              href={getExplorerTransactionUrl(chainId, txnHash)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500"
+            >
+              Blockscout
+            </a> */}
+          </p>
+        ),
+        action: <TransactionLinkButton chainId={chainId} txnHash={txnHash} />,
+        variant: "default",
+      });
+      options?.onSuccess?.(txnHash, variables, context);
+    },
+    onError(error, variables, context) {
+      toast({
+        title: "Deposit Failed!",
+        description: error.message,
+        variant: "destructive",
+      });
+      options?.onError?.(error, variables, context);
+    },
+    ...options,
   });
 }

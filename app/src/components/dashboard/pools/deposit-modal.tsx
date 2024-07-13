@@ -35,9 +35,9 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
     resolver: zodResolver(depositSchema),
     defaultValues: {
       asset: chainAssets[0].address,
-      amount: 0,
-      ltv: 0,
-      interestRate: 0,
+      amount: 1,
+      ltv: 50,
+      interestRate: 5,
       daysLocked: 30,
       collateralChainId: chains[0].id,
     },
