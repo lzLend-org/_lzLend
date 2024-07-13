@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "../interfaces/IChronicle.sol";
-import "../interfaces/ISelfKisser.sol";
+import "../interfaces/oracles/IChronicle.sol";
+import "../interfaces/oracles/ISelfKisser.sol";
 
 import {OApp, MessagingFee, Origin} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OApp.sol";
 import {OAppOptionsType3} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/libs/OAppOptionsType3.sol";
