@@ -14,9 +14,14 @@ import { z } from "zod";
 
 import { TransactionLinkButton } from "@/components/transaction-link-button";
 import { toast } from "@/components/ui/use-toast";
-import { poolFactoryAbi } from "@/lib/abis/pool-factory";
+import { poolDstFactoryAbi } from "@/lib/abis/pool-dst-factory";
+import { poolSrcFactoryAbi } from "@/lib/abis/pool-src-factory";
 import { srcPoolAbi } from "@/lib/abis/src-pool";
-import { POOL_FACTORY_ADDRESS } from "@/lib/addresses";
+import {
+  ORACLE_ADDRESS,
+  POOL_DST_FACTORY_ADDRESS,
+  POOL_SRC_FACTORY_ADDRESS,
+} from "@/lib/addresses";
 import { assets } from "@/lib/assets";
 import { LAYERZERO_ENDPOINT_CONFIG } from "@/lib/layerzero";
 import { isDerivedAccountEnabledAtom } from "@/lib/settings";
@@ -49,10 +54,10 @@ export function useDeposit(options?: UseDepositOptions) {
 
   return useMutation({
     mutationFn: async ({
-      asset,
+      asset: loanAssetAddress,
       amount,
       collateralChainId,
-      collateralAsset,
+      collateralAsset: collateralAssetAddress,
       ltv,
       interestRate,
       daysLocked,
@@ -97,13 +102,13 @@ export function useDeposit(options?: UseDepositOptions) {
 
       const { request: deployDstPoolRequest } = await dstPublicClient.simulateContract({
         account,
-        address: POOL_FACTORY_ADDRESS[chainId],
-        abi: poolFactoryAbi,
+        address: POOL_DST_FACTORY_ADDRESS[chainId],
+        abi: poolDstFactoryAbi,
         functionName: "deployDstPool",
         args: [
           layerZeroDstEndpointAddress,
           delegate,
-          collateralAsset as `0x${string}`,
+          collateralAssetAddress as `0x${string}`,
           LayerZeroDstEndpointId,
         ],
       });
@@ -119,7 +124,7 @@ export function useDeposit(options?: UseDepositOptions) {
         const event = decodeEventLog({
           data: log.data,
           topics: log.topics,
-          abi: poolFactoryAbi,
+          abi: poolDstFactoryAbi,
         });
         if (event.eventName === "DeployedDstPool") {
           dstPoolAddress = event.args.dstPoolAddress;
@@ -141,19 +146,35 @@ export function useDeposit(options?: UseDepositOptions) {
       const expireDate = BigInt(Date.now() / 1000 + 60 * 60 * 24 * daysLocked);
       const parsedLtv = parseUnits(ltv.toString(), LTV_DECIMALS);
       const parsedApr = parseUnits(interestRate.toString(), APR_DECIMALS);
+      const oracleAddress = ORACLE_ADDRESS[chainId];
+
+      const loanAsset = assets[chainId].find((a) => a.address === loanAssetAddress);
+      if (!loanAsset) throw Error("Loan asset not found");
+
+      const collateralAsset = assets[collateralChainId as ChainId].find(
+        (a) => a.address === collateralAssetAddress,
+      );
+      if (!collateralAsset) throw Error("Collateral asset not found");
+
+      const oraclePricesIndex = [
+        BigInt(loanAsset.oraclePriceIndex),
+        BigInt(collateralAsset.oraclePriceIndex),
+      ];
 
       const { request: deploySrcPoolRequest } = await srcPublicClient.simulateContract({
         account,
-        address: POOL_FACTORY_ADDRESS[chainId],
-        abi: poolFactoryAbi,
+        address: POOL_SRC_FACTORY_ADDRESS[chainId],
+        abi: poolSrcFactoryAbi,
         functionName: "deploySrcPool",
         args: [
           layerZeroSrcEndpoint,
           delegate,
           LayerZeroDstEndpointId,
           dstPoolAddress,
-          asset as `0x${string}`,
-          collateralAsset as `0x${string}`,
+          loanAssetAddress as `0x${string}`,
+          oracleAddress,
+          oraclePricesIndex,
+          collateralAssetAddress as `0x${string}`,
           parsedLtv,
           parsedApr,
           expireDate,
@@ -168,7 +189,7 @@ export function useDeposit(options?: UseDepositOptions) {
         const event = decodeEventLog({
           data: log.data,
           topics: log.topics,
-          abi: poolFactoryAbi,
+          abi: poolSrcFactoryAbi,
         });
         if (event.eventName === "DeployedSrcPool") {
           dstPoolAddress = event.args.srcPoolAddress;
@@ -186,13 +207,13 @@ export function useDeposit(options?: UseDepositOptions) {
       });
 
       /* ------- Approve ------- */
-      const depositAsset = assets[chainId].find((a) => a.symbol === asset);
+      const depositAsset = assets[chainId].find((a) => a.symbol === loanAssetAddress);
       if (!depositAsset) throw Error("Deposit asset not found");
 
       const depositAmount = parseUnits(amount.toString(), depositAsset.decimals);
       const { request: approveRequest } = await srcPublicClient.simulateContract({
         account,
-        address: asset as `0x${string}`,
+        address: loanAssetAddress as `0x${string}`,
         abi: erc20Abi,
         functionName: "approve",
         args: [srcPoolAddress, depositAmount],

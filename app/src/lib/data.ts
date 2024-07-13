@@ -1,12 +1,12 @@
 import { mainnet } from "viem/chains";
 
-import { USDC } from "@/lib/assets";
+import { BTC, ETH } from "@/lib/assets";
 import { Loan, Pool } from "@/lib/types";
 
 export const pools: Pool[] = [
   {
     chainId: mainnet.id,
-    asset: USDC,
+    asset: BTC,
     amount: BigInt(1000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -14,12 +14,12 @@ export const pools: Pool[] = [
     expireDate: BigInt(Math.round(Date.now() / 1000 + 60 * 60 * 24 * 30)),
     dstPoolAddress: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     collateralChainId: mainnet.id,
-    collateralAsset: USDC,
+    collateralAsset: ETH,
     ltv: BigInt(5),
   },
   {
     chainId: mainnet.id,
-    asset: USDC,
+    asset: BTC,
     amount: BigInt(1000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -27,12 +27,12 @@ export const pools: Pool[] = [
     expireDate: BigInt(Math.round(Date.now() / 1000 + 60 * 60 * 24 * 30)),
     dstPoolAddress: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     collateralChainId: mainnet.id,
-    collateralAsset: USDC,
+    collateralAsset: ETH,
     ltv: BigInt(5),
   },
   {
     chainId: mainnet.id,
-    asset: USDC,
+    asset: BTC,
     amount: BigInt(1000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -40,12 +40,12 @@ export const pools: Pool[] = [
     expireDate: BigInt(Math.round(Date.now() / 1000 + 60 * 60 * 24 * 30)),
     dstPoolAddress: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     collateralChainId: mainnet.id,
-    collateralAsset: USDC,
+    collateralAsset: ETH,
     ltv: BigInt(5),
   },
   {
     chainId: mainnet.id,
-    asset: USDC,
+    asset: BTC,
     amount: BigInt(1000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -53,12 +53,12 @@ export const pools: Pool[] = [
     expireDate: BigInt(Math.round(Date.now() / 1000 + 60 * 60 * 24 * 30)),
     dstPoolAddress: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     collateralChainId: mainnet.id,
-    collateralAsset: USDC,
+    collateralAsset: ETH,
     ltv: BigInt(5),
   },
   {
     chainId: mainnet.id,
-    asset: USDC,
+    asset: BTC,
     amount: BigInt(1000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
@@ -66,7 +66,7 @@ export const pools: Pool[] = [
     expireDate: BigInt(Math.round(Date.now() / 1000 + 60 * 60 * 24 * 30)),
     dstPoolAddress: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     collateralChainId: mainnet.id,
-    collateralAsset: USDC,
+    collateralAsset: ETH,
     ltv: BigInt(5),
   },
 ];

@@ -1,19 +1,19 @@
 import { getChains, readContracts } from "@wagmi/core";
 
-import { poolFactoryAbi } from "@/lib/abis/pool-factory";
+import { poolSrcFactoryAbi } from "@/lib/abis/pool-src-factory";
 import { srcPoolAbi } from "@/lib/abis/src-pool";
-import { POOL_FACTORY_ADDRESS } from "@/lib/addresses";
-import { USDC, assets } from "@/lib/assets";
+import { POOL_SRC_FACTORY_ADDRESS } from "@/lib/addresses";
+import { assets } from "@/lib/assets";
 import { LAYERZERO_ENDPOINT_CONFIG } from "@/lib/layerzero";
 import { ChainId, Pool } from "@/lib/types";
 import { config } from "@/lib/wagmi";
 
-const allPoolFactories = Object.entries(POOL_FACTORY_ADDRESS).map(
+const allPoolFactories = Object.entries(POOL_SRC_FACTORY_ADDRESS).map(
   ([chainId, address]) =>
     ({
       address,
       chainId: parseInt(chainId) as ChainId,
-      abi: poolFactoryAbi,
+      abi: poolSrcFactoryAbi,
     }) as const,
 );
 
@@ -69,9 +69,13 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
     const chainId = (chains.find((chain) => chain.id === poolAddresses[index].chainId)?.id ||
       chains[0].id) as ChainId;
 
-    const asset = assets[chainId].find((asset) => asset.address === poolMetadata.poolToken) || USDC;
-    const collateralAsset =
-      assets[chainId].find((asset) => asset.address === poolMetadata.collateralToken) || USDC;
+    const asset = assets[chainId].find((asset) => asset.address === poolMetadata.poolToken);
+    if (!asset) return null;
+
+    const collateralAsset = assets[chainId].find(
+      (asset) => asset.address === poolMetadata.collateralToken,
+    );
+    if (!collateralAsset) return null;
 
     const entry = Object.entries(LAYERZERO_ENDPOINT_CONFIG).find(
       ([, config]) => config.id === poolMetadata.dstChainId,
@@ -85,6 +89,7 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
       amount: poolMetadata.poolBalance,
       owner: poolMetadata.poolOwner,
       address: poolAddresses[index].address,
+      dstPoolAddress: poolMetadata.dstPoolAddress,
       apr: poolMetadata.apr,
       expireDate: poolMetadata.expiry,
       collateralChainId,
