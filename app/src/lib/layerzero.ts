@@ -1,4 +1,11 @@
-import { arbitrumSepolia, baseSepolia, mainnet, scrollSepolia, sepolia } from "viem/chains";
+import {
+  arbitrumSepolia,
+  baseSepolia,
+  mainnet,
+  morphHolesky,
+  scrollSepolia,
+  sepolia,
+} from "viem/chains";
 
 import { ChainId } from "@/lib/types";
 
@@ -27,6 +34,10 @@ export const LAYERZERO_ENDPOINT_CONFIG: Record<
   },
   [scrollSepolia.id]: {
     id: 40170,
+    address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+  },
+  [morphHolesky.id]: {
+    id: 40290,
     address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
   },
 };

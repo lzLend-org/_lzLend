@@ -1,4 +1,11 @@
-import { arbitrumSepolia, baseSepolia, mainnet, scrollSepolia, sepolia } from "viem/chains";
+import {
+  arbitrumSepolia,
+  baseSepolia,
+  mainnet,
+  morphHolesky,
+  scrollSepolia,
+  sepolia,
+} from "viem/chains";
 
 import { ChainId } from "@/lib/types";
 
@@ -8,6 +15,7 @@ export const EXPLORER_URL: Record<ChainId, string> = {
   [arbitrumSepolia.id]: "https://sepolia-explorer.arbitrum.io",
   [baseSepolia.id]: "https://base-sepolia.blockscout.com",
   [scrollSepolia.id]: "https://sepolia.scrollscan.com",
+  [morphHolesky.id]: "https://explorer-testnet.morphl2.io/",
 };
 
 export function getExplorerAddressUrl(chainId: ChainId, address: string) {
