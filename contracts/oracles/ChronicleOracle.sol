@@ -15,7 +15,6 @@ contract ChronicleOracle {
             chronicleOracles.push(chronicle);
             selfKisser.selfKiss(address(chronicle));
         }
-        // selfKisser.selfKiss(address(this));
     }
 
     function read() external view returns (uint256[] memory vals) {

@@ -11,9 +11,14 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract FlareOracle is OApp, OAppOptionsType3 {
     IFlareContractRegistry internal contractRegistry;
     IFastUpdater internal ftsoV2;
-    // Feed indexes: 0 = FLR/USD, 2 = BTC/USD, 9 = ETH/USD
-    uint256[] public feedIndexes = [0, 2, 9];
+
+    // Feed indexes: 2 = BTC/USD, 9 = ETH/USD
+    uint256[] public feedIndexes = [2, 9];
     uint16 public constant SEND = 1;
+
+    uint32[] public dstIds;
+
+    event MessageACK(string message, uint32 senderEid, bytes32 sender);
 
     /**
      * Constructor initializes the FTSOv2 contract.
@@ -21,7 +26,8 @@ contract FlareOracle is OApp, OAppOptionsType3 {
      */
     constructor(
         address _endpoint,
-        address _owner
+        address _owner,
+        uint32[] memory _dstIds
     ) OApp(_endpoint, _owner) Ownable(msg.sender) {
         contractRegistry = IFlareContractRegistry(
             0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019
@@ -29,12 +35,14 @@ contract FlareOracle is OApp, OAppOptionsType3 {
         ftsoV2 = IFastUpdater(
             contractRegistry.getContractAddressByName("FastUpdater")
         );
+        dstIds = _dstIds;
     }
 
     /**
      * Get the current value of the feeds.
      */
-    function read() external view returns (uint256[] memory _feedValues) {
+
+    function read() public view returns (uint256[] memory _feedValues) {
         (uint256[] memory feedValues, int8[] memory decimals, ) = ftsoV2
             .fetchCurrentFeeds(feedIndexes);
 
@@ -54,23 +62,19 @@ contract FlareOracle is OApp, OAppOptionsType3 {
     }
 
     function quote(
-        uint32[] memory _dstEids,
-        uint16 _msgType,
-        string memory _message,
+        bytes memory _message,
         bytes calldata _extraSendOptions,
         bool _payInLzToken
     ) public view returns (MessagingFee memory totalFee) {
-        bytes memory encodedMessage = abi.encode(_message);
-
-        for (uint i = 0; i < _dstEids.length; i++) {
+        for (uint i = 0; i < dstIds.length; i++) {
             bytes memory options = combineOptions(
-                _dstEids[i],
-                _msgType,
+                dstIds[i],
+                SEND,
                 _extraSendOptions
             );
             MessagingFee memory fee = _quote(
-                _dstEids[i],
-                encodedMessage,
+                dstIds[i],
+                _message,
                 options,
                 _payInLzToken
             );
@@ -79,39 +83,32 @@ contract FlareOracle is OApp, OAppOptionsType3 {
         }
     }
 
-    function send(
-        uint32[] memory _dstEids,
-        uint16 _msgType,
-        string memory _message,
+    function readAndSend(
         bytes calldata _extraSendOptions // gas settings for A -> B
-    ) external payable {
-        require(_msgType == SEND, "InvalidMessageType()");
+    ) public payable {
+        uint256[] memory prices = read();
 
+        bytes memory encodedMessage = abi.encode(1, prices); 
         // Calculate the total messaging fee required.
         MessagingFee memory totalFee = quote(
-            _dstEids,
-            _msgType,
-            _message,
+            encodedMessage,
             _extraSendOptions,
             false
         );
         require(msg.value >= totalFee.nativeFee, "Insufficient fee provided");
 
-        // Encodes the message before invoking _lzSend.
-        bytes memory _encodedMessage = abi.encode(_message);
-
         uint256 totalNativeFeeUsed = 0;
         uint256 remainingValue = msg.value;
 
-        for (uint i = 0; i < _dstEids.length; i++) {
+        for (uint i = 0; i < dstIds.length; i++) {
             bytes memory options = combineOptions(
-                _dstEids[i],
-                _msgType,
+                dstIds[i],
+                SEND,
                 _extraSendOptions
             );
             MessagingFee memory fee = _quote(
-                _dstEids[i],
-                _encodedMessage,
+                dstIds[i],
+                encodedMessage,
                 options,
                 false
             );
@@ -126,8 +123,8 @@ contract FlareOracle is OApp, OAppOptionsType3 {
             );
 
             _lzSend(
-                _dstEids[i],
-                _encodedMessage,
+                dstIds[i],
+                encodedMessage,
                 options,
                 fee,
                 payable(msg.sender)
@@ -140,5 +137,22 @@ contract FlareOracle is OApp, OAppOptionsType3 {
     ) internal override returns (uint256 nativeFee) {
         if (msg.value < _nativeFee) revert NotEnoughNative(msg.value);
         return _nativeFee;
+    }
+
+    /**
+     * @notice Internal function to handle receiving messages from another chain.
+     * @dev Decodes and processes the received message based on its type.
+     * @param _origin Data about the origin of the received message.
+     * @param message The received message content.
+     */
+    function _lzReceive(
+        Origin calldata _origin,
+        bytes32 /*guid*/,
+        bytes calldata message,
+        address, // Executor address as specified by the OApp.
+        bytes calldata // Any extra data or options to trigger on receipt.
+    ) internal override {
+        string memory _data = abi.decode(message, (string));
+        emit MessageACK(_data, _origin.srcEid, _origin.sender);
     }
 }
