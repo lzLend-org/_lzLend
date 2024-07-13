@@ -112,7 +112,7 @@ export function useDeposit(options?: UseDepositOptions) {
 
       const { request: deployDstPoolRequest } = await dstPublicClient.simulateContract({
         account,
-        address: POOL_DST_FACTORY_ADDRESS[chainId],
+        address: POOL_DST_FACTORY_ADDRESS[collateralChainId as ChainId],
         abi: poolDstFactoryAbi,
         functionName: "deployDstPool",
         args: [
