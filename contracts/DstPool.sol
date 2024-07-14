@@ -48,7 +48,7 @@ contract DstPool is OApp, OAppOptionsType3 {
     function takeLoan(
         uint256 _collateralAmount,
         bytes calldata _extraSendOptions
-    ) external returns (MessagingReceipt memory receipt) {
+    ) external payable returns (MessagingReceipt memory receipt) {
         IERC20(collateralToken).transferFrom(
             msg.sender,
             address(this),
