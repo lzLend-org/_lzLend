@@ -13,12 +13,13 @@ import { useAccount, useChains } from "wagmi";
 import { z } from "zod";
 
 import { TransactionLinkButton } from "@/components/transaction-link-button";
+import { buttonVariants } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { dstPoolAbi } from "@/lib/abis/dst-pool";
 import { assets } from "@/lib/assets";
 import { isDerivedAccountEnabledAtom } from "@/lib/settings";
 import { ChainId, Pool } from "@/lib/types";
-import { deriveAccountFromUid } from "@/lib/utils";
+import { cn, deriveAccountFromUid } from "@/lib/utils";
 
 export const getBorrowSchema = (max: number) =>
   z.object({
@@ -44,7 +45,6 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
       collateralAmount,
       // collateralAsset
     }: BorrowData) => {
-      // return "0xd368d878588a0ff60ce504d22b09c3fc7864ce678b6927d696606062637964b3";
       if (!address) throw Error("Address not found");
 
       const collateralChain = chains.find((chain) => chain.id === pool.collateralChainId);
@@ -168,8 +168,16 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
         title: "Borrow Successfull!",
         description: "Your borrow was successfull",
         action: (
-          <div>
+          <div className="flex flex-col gap-2">
             <TransactionLinkButton chainId={collateralChain.id as ChainId} txnHash={txnHash} />
+            <a
+              href={`https://testnet.layerzeroscan.com/tx/${txnHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(buttonVariants({ size: "sm", variant: "accent" }), "text-sm")}
+            >
+              See on LayerZero
+            </a>
           </div>
         ),
         variant: "default",
