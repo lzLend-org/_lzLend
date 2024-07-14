@@ -14,11 +14,11 @@ task("push", "pushes the readAndSend")
     const contract = await viem.getContractAt(args.contract, args.address);
     // Endpoint ID, contract address on the other chain
     const options = Options.newOptions()
-      .addExecutorLzReceiveOption(65000, 0)
+      .addExecutorLzReceiveOption(120000, 0)
       .toHex();
 
-    const tx0 = await (contract.write as any).updateFeeds([[updateFeed]], {value: 100000000})
-    console.log(tx0)
+    // const tx0 = await (contract.write as any).updateFeeds([[updateFeed]], {value: 100000000})
+    // console.log(tx0)
 
     const prices = await (contract.read as any).read();
 
@@ -36,8 +36,8 @@ task("push", "pushes the readAndSend")
     // [[updateFeed], options],
 
     const tx = await (contract.write as any).readAndSend(
-      [[updateFeed], options],
-      { value: quote.nativeFee }
+      [options],
+      { value: BigInt(quote.nativeFee) * 10n / 9n }
     );
     console.log(tx);
   });
