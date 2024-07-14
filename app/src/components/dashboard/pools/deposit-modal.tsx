@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogTitle } from "@radix-ui/react-dialog";
 import { useForm } from "react-hook-form";
 import { useChainId } from "wagmi";
 import { useChains } from "wagmi";
@@ -68,7 +69,7 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
       modal={true}
     >
       <DialogContent className="flex max-h-[90vh] max-w-md flex-col px-6">
-        <h2 className="text-xl font-semibold">New Deposit</h2>
+        <DialogTitle className="text-xl font-semibold">New Deposit</DialogTitle>
 
         <Form {...form}>
           <form onSubmit={onSubmit} className="flex flex-col gap-3">

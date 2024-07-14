@@ -1,10 +1,10 @@
 import {
   arbitrumSepolia,
   baseSepolia,
-  mainnet,
+  // mainnet,
   morphHolesky,
   scrollSepolia,
-  sepolia,
+  // sepolia,
   zircuitTestnet,
 } from "viem/chains";
 
@@ -25,26 +25,26 @@ export const WETH: Omit<Asset, "address"> = {
 };
 
 export const assets: Record<ChainId, Asset[]> = {
-  [mainnet.id]: [
-    {
-      ...WBTC,
-      address: "0x0000000000000000000000000000000000000000",
-    },
-    {
-      ...WETH,
-      address: "0x0000000000000000000000000000000000000000",
-    },
-  ],
-  [sepolia.id]: [
-    {
-      ...WBTC,
-      address: "0x0000000000000000000000000000000000000000",
-    },
-    {
-      ...WETH,
-      address: "0x0000000000000000000000000000000000000000",
-    },
-  ],
+  // [mainnet.id]: [
+  //   {
+  //     ...WBTC,
+  //     address: "0x0000000000000000000000000000000000000000",
+  //   },
+  //   {
+  //     ...WETH,
+  //     address: "0x0000000000000000000000000000000000000000",
+  //   },
+  // ],
+  // [sepolia.id]: [
+  //   {
+  //     ...WBTC,
+  //     address: "0x0000000000000000000000000000000000000000",
+  //   },
+  //   {
+  //     ...WETH,
+  //     address: "0x0000000000000000000000000000000000000000",
+  //   },
+  // ],
   [arbitrumSepolia.id]: [
     {
       ...WBTC,
