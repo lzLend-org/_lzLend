@@ -85,11 +85,9 @@ contract SrcPool is OApp, OAppOptionsType3 {
         totalFee.lzTokenFee += fee.lzTokenFee;
     }
 
-    function repayLoan()
-        external
-        payable
-        returns (MessagingReceipt memory receipt)
-    {
+    function repayLoan(
+        bytes calldata _extraSendOptions
+    ) external payable returns (MessagingReceipt memory receipt) {
         require(loans[msg.sender].amount > 0, "Pool: no loan to repay");
         require(block.timestamp <= poolMetadata.expiry, "Pool: loan expired");
         require(
@@ -97,8 +95,15 @@ contract SrcPool is OApp, OAppOptionsType3 {
                 getRepaymentAmount(msg.sender),
             "Pool: insufficient balance"
         );
+
         uint256 totalRepayment = getRepaymentAmount(msg.sender);
         poolMetadata.poolBalance += totalRepayment;
+
+        bytes memory options = combineOptions(
+            poolMetadata.dstChainId,
+            SEND,
+            _extraSendOptions
+        );
 
         require(
             IERC20(poolMetadata.poolToken).transferFrom(
@@ -111,11 +116,17 @@ contract SrcPool is OApp, OAppOptionsType3 {
         delete loans[msg.sender];
 
         bytes memory payload = abi.encode(msg.sender);
+        MessagingFee memory fee = _quote(
+            poolMetadata.dstChainId,
+            payload,
+            options,
+            false
+        );
         receipt = _lzSend(
             poolMetadata.dstChainId,
             payload,
-            "",
-            MessagingFee(0, 0),
+            options,
+            fee,
             payable(msg.sender)
         );
     }

@@ -40,10 +40,10 @@ hh deploy:custom --contract PoolSrcFactory --params '[]' --network base_sepolia
 hh deploy:custom --contract PoolDstFactory --params '[]' --network base_sepolia
 hh deploy:custom --contract PoolSrcFactory --params '[]' --network scroll_sepolia
 
-# hh deploy:custom --contract PoolDstFactory --params '[]' --network scroll_sepolia
+hh deploy:custom --contract PoolDstFactory --params '[]' --network scroll_sepolia
 
-# hh deploy:custom --contract PoolSrcFactory --params '[]' --network morph
-# hh deploy:custom --contract PoolDstFactory --params '[]' --network morph
+hh deploy:custom --contract PoolSrcFactory --params '[]' --network morph
+hh deploy:custom --contract PoolDstFactory --params '[]' --network morph
 
 # setPeer to the different apps
 # # chronicle -> oracle (A)
