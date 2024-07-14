@@ -21,38 +21,10 @@ export interface GetPoolsParams {
   owner?: `0x${string}`;
 }
 
-export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
-  const { owner } = params || {};
-
+export async function getPoolsMetadata(
+  poolAddresses: { chainId: ChainId; address: `0x${string}` }[],
+) {
   const chains = getChains(config);
-
-  const poolResults = await readContracts(config, {
-    contracts: allPoolFactories.map(
-      (poolFactory) =>
-        ({
-          address: poolFactory.address,
-          abi: poolFactory.abi,
-          chainId: poolFactory.chainId,
-          functionName: owner ? "getSrcPoolsByOwner" : "getAllSrcPools",
-          args: owner ? [owner] : undefined,
-        }) as const,
-    ),
-  });
-
-  console.log("poolResults", poolResults);
-
-  // console.log("poolResults: ", poolResults);
-
-  const poolAddresses: { chainId: ChainId; address: `0x${string}` }[] = [];
-
-  poolResults.forEach((result, index) => {
-    result.result?.forEach((poolAddress) => {
-      poolAddresses.push({
-        chainId: allPoolFactories[index].chainId,
-        address: poolAddress,
-      });
-    });
-  });
 
   const poolMetadataResults = await readContracts(config, {
     contracts: poolAddresses.map(
@@ -108,4 +80,67 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
   // console.log("Src Pools: ", srcPools);
 
   return srcPools.filter((pool): pool is Pool => pool !== null && pool.amount > BigInt(0));
+}
+
+export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
+  const { owner } = params || {};
+
+  const poolResults = await readContracts(config, {
+    contracts: allPoolFactories.map(
+      (poolFactory) =>
+        ({
+          address: poolFactory.address,
+          abi: poolFactory.abi,
+          chainId: poolFactory.chainId,
+          functionName: owner ? "getSrcPoolsByOwner" : "getAllSrcPools",
+          args: owner ? [owner] : undefined,
+        }) as const,
+    ),
+  });
+
+  console.log("poolResults", poolResults);
+
+  // console.log("poolResults: ", poolResults);
+
+  const poolAddresses: { chainId: ChainId; address: `0x${string}` }[] = [];
+
+  poolResults.forEach((result, index) => {
+    result.result?.forEach((poolAddress) => {
+      poolAddresses.push({
+        chainId: allPoolFactories[index].chainId,
+        address: poolAddress,
+      });
+    });
+  });
+
+  return getPoolsMetadata(poolAddresses);
+}
+
+export async function getListedPools() {
+  const poolResults = await readContracts(config, {
+    contracts: allPoolFactories.map(
+      (poolFactory) =>
+        ({
+          address: poolFactory.address,
+          abi: poolFactory.abi,
+          chainId: poolFactory.chainId,
+          functionName: "getListedSrcPools",
+        }) as const,
+    ),
+  });
+
+  console.log("poolResults", poolResults);
+
+  const poolAddresses: { chainId: ChainId; address: `0x${string}` }[] = [];
+
+  poolResults.forEach((result, index) => {
+    result.result?.forEach((poolAddress) => {
+      poolAddresses.push({
+        chainId: allPoolFactories[index].chainId,
+        address: poolAddress,
+      });
+    });
+  });
+
+  return getPoolsMetadata(poolAddresses);
 }

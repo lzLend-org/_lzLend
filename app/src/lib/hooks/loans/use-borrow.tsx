@@ -175,7 +175,7 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
       console.log("Error: ", error.message);
 
       toast({
-        title: "Deposit Failed!",
+        title: "Borrow Failed!",
         description: error.message,
         variant: "destructive",
       });

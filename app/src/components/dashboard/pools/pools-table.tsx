@@ -84,7 +84,7 @@ export function PoolsTable() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center">
+                <TableCell colSpan={10} className="text-center">
                   {isPending ? (
                     <div className="flex justify-center py-10">
                       <Spinner />

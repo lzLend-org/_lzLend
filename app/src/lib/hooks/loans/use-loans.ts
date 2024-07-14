@@ -1,9 +1,12 @@
 import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { readContracts } from "@wagmi/core";
+import { useAtomValue } from "jotai";
 
 import { srcPoolAbi } from "@/lib/abis/src-pool";
 import { getPools } from "@/lib/pools";
+import { isDerivedAccountEnabledAtom } from "@/lib/settings";
 import { Loan } from "@/lib/types";
+import { deriveAccountFromUid } from "@/lib/utils";
 import { config } from "@/lib/wagmi";
 
 type UseLoansOptions = Omit<
@@ -14,12 +17,20 @@ type UseLoansOptions = Omit<
 };
 
 export function useLoans(params?: UseLoansOptions) {
+  const isDerivedAccountEnabled = useAtomValue(isDerivedAccountEnabledAtom);
+
   const { owner } = params || {};
 
   return useQuery<Loan[]>({
-    queryKey: ["user-loans", owner],
+    queryKey: ["user-loans", owner, isDerivedAccountEnabled],
     queryFn: async () => {
-      const pools = await getPools({ owner });
+      let ownerAddress = owner;
+
+      if (owner && isDerivedAccountEnabled) {
+        ownerAddress = deriveAccountFromUid(owner).address;
+      }
+
+      const pools = await getPools({ owner: ownerAddress });
 
       const results = await readContracts(config, {
         contracts: pools.map(

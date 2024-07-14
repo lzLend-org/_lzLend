@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { formatUnits } from "viem";
-import { useAccount, useChains } from "wagmi";
+import { useChains } from "wagmi";
 
-import { ListModal } from "@/components/dashboard/marketplace/list-modal";
-import { DepositModal } from "@/components/dashboard/pools/deposit-modal";
+import { Address } from "@/components/address";
+import { BuyModal } from "@/components/dashboard/marketplace/buy-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
@@ -17,31 +17,23 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-// import { pools } from "@/lib/data";
-import { usePools } from "@/lib/hooks/pools/use-pools";
+import { useListedPools } from "@/lib/hooks/marketplace/use-listed-pools";
 import { Pool } from "@/lib/types";
 import { APR_DECIMALS, LTV_DECIMALS, getDaysDifference } from "@/lib/utils";
 
-export function UserPoolsTable() {
-  const { address } = useAccount();
+export function ListedPoolsTable() {
   const chains = useChains();
-  const { data: userPools, isPending } = usePools({
-    owner: address,
-    enabled: !!address,
-  });
-
-  // console.log("User Pools: ", data);
 
   const [selectedPool, setSelectedPool] = useState<Pool | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isListModalOpen, setIsListModalOpen] = useState(false);
+
+  const { data: listedPools, isPending } = useListedPools();
+  // console.log("Pools: ", data);
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Active Deposits</CardTitle>
-        <Button onClick={() => setIsModalOpen(true)}>New Deposit</Button>
-        <DepositModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+      <CardHeader className="flex flex-row items-center justify-between py-6">
+        <CardTitle>Listed Pools</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -54,12 +46,14 @@ export function UserPoolsTable() {
               <TableHead>LTV</TableHead>
               <TableHead>Locked Days</TableHead>
               <TableHead>Collateral Chain</TableHead>
+              <TableHead>Collateral Asset</TableHead>
+              <TableHead>By</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {userPools?.length ? (
-              userPools.map((pool, index) => (
+            {listedPools?.length ? (
+              listedPools.map((pool, index) => (
                 <TableRow key={index}>
                   <TableCell>{chains.find((chain) => chain.id === pool.chainId)?.name}</TableCell>
                   <TableCell>{pool.asset.symbol}</TableCell>
@@ -70,38 +64,41 @@ export function UserPoolsTable() {
                   <TableCell>
                     {chains.find((chain) => chain.id === pool.collateralChainId)?.name}
                   </TableCell>
+                  <TableCell>{pool.collateralAsset.symbol}</TableCell>
+                  <TableCell>
+                    <Address address={pool.owner} />
+                  </TableCell>
                   <TableCell>
                     <Button
                       size="sm"
                       variant="accent"
                       onClick={() => {
+                        setIsModalOpen(true);
                         setSelectedPool(pool);
-                        setIsListModalOpen(true);
                       }}
                     >
-                      List for Sale
+                      Buy
                     </Button>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center">
+                <TableCell colSpan={10} className="text-center">
                   {isPending ? (
                     <div className="flex justify-center py-10">
                       <Spinner />
                     </div>
                   ) : (
-                    "No active deposits"
+                    "No listed pools"
                   )}
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
-
         {selectedPool && (
-          <ListModal open={isListModalOpen} onOpenChange={setIsListModalOpen} pool={selectedPool} />
+          <BuyModal pool={selectedPool} onOpenChange={setIsModalOpen} open={isModalOpen} />
         )}
       </CardContent>
     </Card>
