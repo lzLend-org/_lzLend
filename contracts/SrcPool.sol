@@ -119,17 +119,6 @@ contract SrcPool is OApp, OAppOptionsType3 {
     /// @dev requires approval from user
     function deposit(uint256 _amount) external {
         require(_amount > 0, "Pool: amount must be greater than 0");
-        require(
-            IERC20(poolMetadata.poolToken).allowance(
-                msg.sender,
-                address(this)
-            ) >= _amount,
-            "Pool: insufficient allowance"
-        );
-        require(
-            IERC20(poolMetadata.poolToken).balanceOf(msg.sender) >= _amount,
-            "Pool: insufficient balance"
-        );
         IERC20(poolMetadata.poolToken).transferFrom(
             msg.sender,
             address(this),
@@ -190,8 +179,8 @@ contract SrcPool is OApp, OAppOptionsType3 {
         );
         poolMetadata.poolBalance -= loanAmount;
 
-        IERC20(poolMetadata.poolToken).transferFrom(
-            address(this),
+        IERC20(poolMetadata.poolToken).approve(address(this), loanAmount);
+        IERC20(poolMetadata.poolToken).transfer(
             borrower,
             loanAmount
         );

@@ -32,13 +32,13 @@
 # hh deploy:custom --contract Oracle --params '["0x6EDCE65403992e310A62460808c4b910D972f10f", "0xCf12de817eb7b858E15175f42483997DD0Ac9bd5"]' --network morph
 
 # deploy the pool factory
-# hh deploy:custom --contract PoolSrcFactory --params '[]' --network zircuit_sepolia
-# hh deploy:custom --contract PoolDstFactory --params '[]' --network zircuit_sepolia
-# hh deploy:custom --contract PoolSrcFactory --params '[]' --network arbitrum_sepolia
-# hh deploy:custom --contract PoolDstFactory --params '[]' --network arbitrum_sepolia
-# hh deploy:custom --contract PoolSrcFactory --params '[]' --network base_sepolia
-# hh deploy:custom --contract PoolDstFactory --params '[]' --network base_sepolia
-# hh deploy:custom --contract PoolSrcFactory --params '[]' --network scroll_sepolia
+hh deploy:custom --contract PoolSrcFactory --params '[]' --network zircuit_sepolia
+hh deploy:custom --contract PoolDstFactory --params '[]' --network zircuit_sepolia
+hh deploy:custom --contract PoolSrcFactory --params '[]' --network arbitrum_sepolia
+hh deploy:custom --contract PoolDstFactory --params '[]' --network arbitrum_sepolia
+hh deploy:custom --contract PoolSrcFactory --params '[]' --network base_sepolia
+hh deploy:custom --contract PoolDstFactory --params '[]' --network base_sepolia
+hh deploy:custom --contract PoolSrcFactory --params '[]' --network scroll_sepolia
 
 # hh deploy:custom --contract PoolDstFactory --params '[]' --network scroll_sepolia
 
@@ -101,3 +101,6 @@
 # hh push --contract ChronicleOracle --address "0x15e00f073322da8c03fe2dd15fae7013c0945e53" --params '[]' --network scroll_sepolia
 # hh push --contract FlareOracle --address "0x49682be434b2125eaedf0e33dbbe60e89c26fda4" --params '[]' --network coston2
 # hh push --contract PythOracle --address "0xecd07d9801e4dd8c87d5f2443cd27b5cf0317f69" --params '[]' --network fuji
+
+
+# ["58706490654070000000000","3165405034520000000000","1000000000000000000"]
