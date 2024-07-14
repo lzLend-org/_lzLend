@@ -13,6 +13,8 @@ interface UseGetBorrowAmountParams {
 export function useGetBorrowAmount({ pool, collateralAmount }: UseGetBorrowAmountParams) {
   const chains = useChains();
 
+  // const amount = isNaN(parseInt(collateralAmount.toString()) ? 0 : collateralAmount);
+
   const collateralChain = chains.find((chain) => chain.id === pool.collateralChainId);
   const collateralChainId = (collateralChain || chains[0]).id as ChainId;
 

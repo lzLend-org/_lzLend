@@ -21,10 +21,76 @@ export interface GetPoolsParams {
   owner?: `0x${string}`;
 }
 
+export async function getPoolsMetadata(
+  poolAddresses: { chainId: ChainId; address: `0x${string}` }[],
+) {
+  const chains = getChains(config);
+
+  const poolMetadataResults = await readContracts(config, {
+    contracts: poolAddresses.map(
+      (poolAddress) =>
+        ({
+          address: poolAddress.address,
+          abi: srcPoolAbi,
+          chainId: poolAddress.chainId,
+          functionName: "getPoolMetadata",
+        }) as const,
+    ),
+  });
+
+  console.log("poolMetadataResults: ", poolMetadataResults);
+
+  const srcPools: (Pool | null)[] = poolMetadataResults.map((result, index) => {
+    const poolMetadata = result.result;
+    if (!poolMetadata) return null;
+
+    // console.log("poolMetadata: ", poolMetadata);
+
+    const chainId = (chains.find((chain) => chain.id === poolAddresses[index].chainId)?.id ||
+      chains[0].id) as ChainId;
+
+    const asset = assets[chainId].find(
+      (asset) => asset.address.toLowerCase() === poolMetadata.poolToken.toLowerCase(),
+    );
+    if (!asset) return null;
+
+    // console.log("Asset: ", asset);
+
+    const entry = Object.entries(LAYERZERO_ENDPOINT_CONFIG).find(
+      ([, config]) => config.id === poolMetadata.dstChainId,
+    );
+    if (!entry) return null;
+    const collateralChainId = parseInt(entry[0]) as ChainId;
+
+    // console.log("collateralChainId: ", collateralChainId);
+
+    const collateralAsset = assets[collateralChainId as ChainId].find(
+      (asset) => asset.address.toLowerCase() === poolMetadata.collateralToken.toLowerCase(),
+    );
+    if (!collateralAsset) return null;
+
+    return {
+      chainId,
+      asset,
+      amount: poolMetadata.poolBalance,
+      owner: poolMetadata.poolOwner,
+      address: poolAddresses[index].address,
+      dstPoolAddress: poolMetadata.dstPoolAddress,
+      apr: poolMetadata.apr,
+      expireDate: poolMetadata.expiry,
+      collateralChainId,
+      collateralAsset,
+      ltv: poolMetadata.ltv,
+    };
+  });
+
+  console.log("Src Pools: ", srcPools);
+
+  return srcPools.filter((pool): pool is Pool => pool !== null && pool.amount > BigInt(0));
+}
+
 export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
   const { owner } = params || {};
-
-  const chains = getChains(config);
 
   const poolResults = await readContracts(config, {
     contracts: allPoolFactories.map(
@@ -54,58 +120,36 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
     });
   });
 
-  const poolMetadataResults = await readContracts(config, {
-    contracts: poolAddresses.map(
-      (poolAddress) =>
+  console.log("poolAddresses: ", poolAddresses);
+
+  return getPoolsMetadata(poolAddresses);
+}
+
+export async function getListedPools() {
+  const poolResults = await readContracts(config, {
+    contracts: allPoolFactories.map(
+      (poolFactory) =>
         ({
-          address: poolAddress.address,
-          abi: srcPoolAbi,
-          chainId: poolAddress.chainId,
-          functionName: "getPoolMetadata",
+          address: poolFactory.address,
+          abi: poolFactory.abi,
+          chainId: poolFactory.chainId,
+          functionName: "getListedSrcPools",
         }) as const,
     ),
   });
 
-  console.log("poolMetadataResults: ", poolMetadataResults);
+  console.log("poolResults", poolResults);
 
-  const srcPools: (Pool | null)[] = poolMetadataResults.map((result, index) => {
-    const poolMetadata = result.result;
+  const poolAddresses: { chainId: ChainId; address: `0x${string}` }[] = [];
 
-    if (!poolMetadata) return null;
-
-    const chainId = (chains.find((chain) => chain.id === poolAddresses[index].chainId)?.id ||
-      chains[0].id) as ChainId;
-
-    const asset = assets[chainId].find((asset) => asset.address === poolMetadata.poolToken);
-    if (!asset) return null;
-
-    const entry = Object.entries(LAYERZERO_ENDPOINT_CONFIG).find(
-      ([, config]) => config.id === poolMetadata.dstChainId,
-    );
-    if (!entry) return null;
-    const collateralChainId = parseInt(entry[0]) as ChainId;
-
-    const collateralAsset = assets[collateralChainId as ChainId].find(
-      (asset) => asset.address === poolMetadata.collateralToken,
-    );
-    if (!collateralAsset) return null;
-
-    return {
-      chainId,
-      asset,
-      amount: poolMetadata.poolBalance,
-      owner: poolMetadata.poolOwner,
-      address: poolAddresses[index].address,
-      dstPoolAddress: poolMetadata.dstPoolAddress,
-      apr: poolMetadata.apr,
-      expireDate: poolMetadata.expiry,
-      collateralChainId,
-      collateralAsset,
-      ltv: poolMetadata.ltv,
-    };
+  poolResults.forEach((result, index) => {
+    result.result?.forEach((poolAddress) => {
+      poolAddresses.push({
+        chainId: allPoolFactories[index].chainId,
+        address: poolAddress,
+      });
+    });
   });
 
-  // console.log("Src Pools: ", srcPools);
-
-  return srcPools.filter((pool): pool is Pool => pool !== null && pool.amount > BigInt(0));
+  return getPoolsMetadata(poolAddresses);
 }

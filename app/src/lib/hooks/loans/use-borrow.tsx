@@ -118,7 +118,8 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
         ],
         [userAddress, parsedCollateralAmount],
       );
-      const options = "0x0003010011010000000000000000000000000000fde8";
+      // const options = "0x0003010011010000000000000000000000000000fde8";
+      const options = "0x0003010011010000000000000000000000000007a120";
 
       const quote = await publicClient.readContract({
         account,
@@ -175,7 +176,7 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
       console.log("Error: ", error.message);
 
       toast({
-        title: "Deposit Failed!",
+        title: "Borrow Failed!",
         description: error.message,
         variant: "destructive",
       });

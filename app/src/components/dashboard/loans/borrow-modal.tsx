@@ -48,7 +48,7 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
     isPending: isPendingGetBorrowAmount,
   } = useGetBorrowAmount({
     pool,
-    collateralAmount,
+    collateralAmount: 0,
   });
 
   console.log("error: ", error);
