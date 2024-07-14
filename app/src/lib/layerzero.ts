@@ -1,10 +1,10 @@
 import {
   arbitrumSepolia,
   baseSepolia,
-  mainnet,
+  // mainnet,
   morphHolesky,
   scrollSepolia,
-  sepolia,
+  // sepolia,
   zircuitTestnet,
 } from "viem/chains";
 
@@ -17,14 +17,14 @@ export const LAYERZERO_ENDPOINT_CONFIG: Record<
     address: `0x${string}`;
   }
 > = {
-  [mainnet.id]: {
-    id: 30101,
-    address: "0x1a44076050125825900e736c501f859c50fE728c",
-  },
-  [sepolia.id]: {
-    id: 40161,
-    address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
-  },
+  // [mainnet.id]: {
+  //   id: 30101,
+  //   address: "0x1a44076050125825900e736c501f859c50fE728c",
+  // },
+  // [sepolia.id]: {
+  //   id: 40161,
+  //   address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+  // },
   [arbitrumSepolia.id]: {
     id: 40231,
     address: "0x6EDCE65403992e310A62460808c4b910D972f10f",
