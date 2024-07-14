@@ -6,8 +6,14 @@ import {OApp, MessagingFee, Origin} from "@layerzerolabs/lz-evm-oapp-v2/contract
 import {MessagingReceipt} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OAppSender.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IOracle} from "./interfaces/oracles/IOracle.sol";
+// import { ONFT721 } from "./onft721/ONFT721.sol";
+import {ONFT721} from "./onft721/ONFT721Simplified.sol";
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {OAppOptionsType3} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/libs/OAppOptionsType3.sol";
 
-contract SrcPool is OApp {
+contract SrcPool is OApp, ONFT721, OAppOptionsType3 {
+    uint16 public constant SEND = 1;
+
     struct PoolMetadata {
         uint32 dstChainId;
         address dstPoolAddress;
@@ -45,7 +51,11 @@ contract SrcPool is OApp {
         uint256 _ltv,
         uint256 _apr,
         uint256 _expiry
-    ) OApp(_endpoint, _delegate) Ownable(_delegate) {
+    )
+        OApp(_endpoint, _delegate)
+        Ownable(_delegate)
+        ONFT721("name", "symbol", _endpoint, msg.sender)
+    {
         poolMetadata.dstChainId = _dstChainId;
         poolMetadata.dstPoolAddress = _dstPoolAddress;
         poolMetadata.poolOwner = _delegate;
@@ -58,6 +68,39 @@ contract SrcPool is OApp {
         poolMetadata.expiry = _expiry;
 
         poolMetadata.poolBalance = 0;
+    }
+
+    // function listNFT(uint256 tokenId, uint256 price) external {
+    //     require(ownerOf(tokenId) == msg.sender, "Not the owner");
+    //     require(price > 0, "Price must be greater than 0");
+
+    //     listings[tokenId] = Listing({
+    //         seller: msg.sender,
+    //         price: price,
+    //         isActive: true
+    //     });
+
+    //     transferFrom(msg.sender, address(this), tokenId);
+    // }
+
+    function quote(
+        bytes memory _message,
+        bytes calldata _extraSendOptions,
+        bool _payInLzToken
+    ) public view returns (MessagingFee memory totalFee) {
+        bytes memory options = combineOptions(
+            poolMetadata.dstChainId,
+            SEND,
+            _extraSendOptions
+        );
+        MessagingFee memory fee = _quote(
+            poolMetadata.dstChainId,
+            _message,
+            options,
+            _payInLzToken
+        );
+        totalFee.nativeFee += fee.nativeFee;
+        totalFee.lzTokenFee += fee.lzTokenFee;
     }
 
     function repayLoan() external returns (MessagingReceipt memory receipt) {
@@ -124,6 +167,18 @@ contract SrcPool is OApp {
         return loan.amount + interest;
     }
 
+    function getLoanAmount(uint256 collateral) public view returns(uint256 loanAmount) {
+        uint256 poolPrice = IOracle(poolMetadata.oracleAddress).getPrice(
+            poolMetadata.oraclePricesIndex[0]
+        );
+        uint256 debtPrice = IOracle(poolMetadata.oracleAddress).getPrice(
+            poolMetadata.oraclePricesIndex[1]
+        );
+
+        loanAmount = (collateral * debtPrice * poolMetadata.ltv) /
+            (poolPrice * 10000);
+    }
+
     function _lzReceive(
         Origin calldata /*_origin*/,
         bytes32 /*_guid*/,
@@ -136,15 +191,7 @@ contract SrcPool is OApp {
             (address, uint256)
         );
 
-        uint256 poolPrice = IOracle(poolMetadata.oracleAddress).getPrice(
-            poolMetadata.oraclePricesIndex[0]
-        );
-        uint256 debtPrice = IOracle(poolMetadata.oracleAddress).getPrice(
-            poolMetadata.oraclePricesIndex[1]
-        );
-
-        uint256 loanAmount = (collateral * debtPrice * poolMetadata.ltv) /
-            (poolPrice * 10000);
+        uint256 loanAmount = getLoanAmount(collateral);
 
         require(
             poolMetadata.poolBalance >= loanAmount,

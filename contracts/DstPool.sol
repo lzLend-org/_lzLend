@@ -5,12 +5,14 @@ import {OApp, MessagingFee, Origin} from "@layerzerolabs/lz-evm-oapp-v2/contract
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {MessagingReceipt} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OAppSender.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {OAppOptionsType3} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/libs/OAppOptionsType3.sol";
 
-contract DstPool is OApp {
+contract DstPool is OApp, OAppOptionsType3 {
     mapping(address => uint256) public depositedCollateral;
 
     address public collateralToken;
     uint32 public dstChainId;
+    uint16 public constant SEND = 1;
 
     constructor(
         address _endpoint,
@@ -22,9 +24,30 @@ contract DstPool is OApp {
         dstChainId = _dstChainId;
     }
 
+    function quote(
+        bytes memory _message,
+        bytes calldata _extraSendOptions,
+        bool _payInLzToken
+    ) public view returns (MessagingFee memory totalFee) {
+        bytes memory options = combineOptions(
+            dstChainId,
+            SEND,
+            _extraSendOptions
+        );
+        MessagingFee memory fee = _quote(
+            dstChainId,
+            _message,
+            options,
+            _payInLzToken
+        );
+        totalFee.nativeFee += fee.nativeFee;
+        totalFee.lzTokenFee += fee.lzTokenFee;
+    }
+
     /// @dev requires approval from user
     function takeLoan(
-        uint256 _collateralAmount
+        uint256 _collateralAmount,
+        bytes calldata _extraSendOptions
     ) external returns (MessagingReceipt memory receipt) {
         IERC20(collateralToken).transferFrom(
             msg.sender,
@@ -33,12 +56,20 @@ contract DstPool is OApp {
         );
         depositedCollateral[msg.sender] += _collateralAmount;
 
+        bytes memory options = combineOptions(
+            dstChainId,
+            SEND,
+            _extraSendOptions
+        );
+
         bytes memory payload = abi.encode(msg.sender, _collateralAmount);
+        MessagingFee memory fee = _quote(dstChainId, payload, options, false);
+
         receipt = _lzSend(
             dstChainId,
             payload,
-            "",
-            MessagingFee(0, 0),
+            options,
+            fee,
             payable(msg.sender)
         );
     }
