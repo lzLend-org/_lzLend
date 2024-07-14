@@ -42,14 +42,19 @@ export async function getPoolsMetadata(
 
   const srcPools: (Pool | null)[] = poolMetadataResults.map((result, index) => {
     const poolMetadata = result.result;
-
     if (!poolMetadata) return null;
+
+    // console.log("poolMetadata: ", poolMetadata);
 
     const chainId = (chains.find((chain) => chain.id === poolAddresses[index].chainId)?.id ||
       chains[0].id) as ChainId;
 
-    const asset = assets[chainId].find((asset) => asset.address === poolMetadata.poolToken);
+    const asset = assets[chainId].find(
+      (asset) => asset.address.toLowerCase() === poolMetadata.poolToken.toLowerCase(),
+    );
     if (!asset) return null;
+
+    // console.log("Asset: ", asset);
 
     const entry = Object.entries(LAYERZERO_ENDPOINT_CONFIG).find(
       ([, config]) => config.id === poolMetadata.dstChainId,
@@ -57,8 +62,10 @@ export async function getPoolsMetadata(
     if (!entry) return null;
     const collateralChainId = parseInt(entry[0]) as ChainId;
 
+    // console.log("collateralChainId: ", collateralChainId);
+
     const collateralAsset = assets[collateralChainId as ChainId].find(
-      (asset) => asset.address === poolMetadata.collateralToken,
+      (asset) => asset.address.toLowerCase() === poolMetadata.collateralToken.toLowerCase(),
     );
     if (!collateralAsset) return null;
 
@@ -77,7 +84,7 @@ export async function getPoolsMetadata(
     };
   });
 
-  // console.log("Src Pools: ", srcPools);
+  console.log("Src Pools: ", srcPools);
 
   return srcPools.filter((pool): pool is Pool => pool !== null && pool.amount > BigInt(0));
 }
@@ -112,6 +119,8 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
       });
     });
   });
+
+  console.log("poolAddresses: ", poolAddresses);
 
   return getPoolsMetadata(poolAddresses);
 }

@@ -1,5 +1,5 @@
 import { UseMutationOptions, useMutation } from "@tanstack/react-query";
-import { getWalletClient } from "@wagmi/core";
+// import { getWalletClient } from "@wagmi/core";
 import { useAtomValue } from "jotai";
 import {
   createWalletClient,
@@ -28,7 +28,7 @@ import { LAYERZERO_ENDPOINT_CONFIG } from "@/lib/layerzero";
 import { isDerivedAccountEnabledAtom } from "@/lib/settings";
 import { ChainId } from "@/lib/types";
 import { APR_DECIMALS, LTV_DECIMALS, deriveAccountFromUid, padAddress } from "@/lib/utils";
-import { config } from "@/lib/wagmi";
+// import { config } from "@/lib/wagmi";
 
 export const depositSchema = z.object({
   asset: z.string().min(1),
@@ -79,14 +79,19 @@ export function useDeposit(options?: UseDepositOptions) {
 
       console.log("Account: ", account);
 
-      const defaultWalletClient = await getWalletClient(config);
-      const srcWalletClient = isDerivedAccountEnabled
-        ? createWalletClient({
-            account,
-            chain: srcChain,
-            transport: http(),
-          })
-        : defaultWalletClient;
+      // const defaultWalletClient = await getWalletClient(config);
+      // const srcWalletClient = isDerivedAccountEnabled
+      //   ? createWalletClient({
+      //       account,
+      //       chain: srcChain,
+      //       transport: http(),
+      //     })
+      //   : defaultWalletClient;
+      const srcWalletClient = createWalletClient({
+        account,
+        chain: srcChain,
+        transport: http(),
+      });
 
       // const addresses = await srcWalletClient.getAddresses();
       // console.log("Addresses: ", addresses);
@@ -100,13 +105,19 @@ export function useDeposit(options?: UseDepositOptions) {
       const dstChain = chains.find((chain) => chain.id === collateralChainId);
       if (!dstChain) throw Error("Chain not found");
 
-      const dstWalletClient = isDerivedAccountEnabled
-        ? createWalletClient({
-            account,
-            chain: dstChain,
-            transport: http(),
-          })
-        : defaultWalletClient;
+      // const dstWalletClient = isDerivedAccountEnabled
+      //   ? createWalletClient({
+      //       account,
+      //       chain: dstChain,
+      //       transport: http(),
+      //     })
+      //   : defaultWalletClient;
+      const dstWalletClient = createWalletClient({
+        account,
+        chain: dstChain,
+        transport: http(),
+      });
+
       const dstPublicClient = createPublicClient({
         chain: dstChain,
         transport: http(),
