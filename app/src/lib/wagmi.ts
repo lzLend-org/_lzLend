@@ -2,9 +2,9 @@ import { http } from "viem";
 import {
   arbitrumSepolia,
   baseSepolia,
-  mainnet,
+  // mainnet,
   scrollSepolia,
-  sepolia,
+  // sepolia,
   morphHolesky,
   zircuitTestnet,
 } from "viem/chains";
@@ -18,8 +18,8 @@ declare module "wagmi" {
 
 export const config = createConfig({
   chains: [
-    mainnet,
-    sepolia,
+    // mainnet,
+    // sepolia,
     arbitrumSepolia,
     baseSepolia,
     scrollSepolia,
@@ -28,8 +28,8 @@ export const config = createConfig({
   ],
   multiInjectedProviderDiscovery: false,
   transports: {
-    [mainnet.id]: http(),
-    [sepolia.id]: http(),
+    // [mainnet.id]: http(),
+    // [sepolia.id]: http(),
     [arbitrumSepolia.id]: http(),
     [baseSepolia.id]: http(),
     [scrollSepolia.id]: http(),

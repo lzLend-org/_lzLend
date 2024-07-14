@@ -81,7 +81,10 @@ export function useDeposit(options?: UseDepositOptions) {
         account,
         chain: srcChain,
         transport: http(),
+        // transport: custom(window.ethereum),
       });
+
+      // const addresses = await srcWalletClient.getAddresses();
 
       const srcPublicClient = createPublicClient({
         chain: srcChain,

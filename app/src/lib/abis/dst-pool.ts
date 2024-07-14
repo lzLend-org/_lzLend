@@ -63,6 +63,17 @@ export const dstPoolAbi = [
     type: "error",
   },
   {
+    inputs: [
+      {
+        internalType: "bytes",
+        name: "options",
+        type: "bytes",
+      },
+    ],
+    name: "InvalidOptions",
+    type: "error",
+  },
+  {
     inputs: [],
     name: "LzTokenUnavailable",
     type: "error",
@@ -153,6 +164,36 @@ export const dstPoolAbi = [
     anonymous: false,
     inputs: [
       {
+        components: [
+          {
+            internalType: "uint32",
+            name: "eid",
+            type: "uint32",
+          },
+          {
+            internalType: "uint16",
+            name: "msgType",
+            type: "uint16",
+          },
+          {
+            internalType: "bytes",
+            name: "options",
+            type: "bytes",
+          },
+        ],
+        indexed: false,
+        internalType: "struct EnforcedOptionParam[]",
+        name: "_enforcedOptions",
+        type: "tuple[]",
+      },
+    ],
+    name: "EnforcedOptionSet",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: "address",
         name: "previousOwner",
@@ -186,6 +227,19 @@ export const dstPoolAbi = [
     ],
     name: "PeerSet",
     type: "event",
+  },
+  {
+    inputs: [],
+    name: "SEND",
+    outputs: [
+      {
+        internalType: "uint16",
+        name: "",
+        type: "uint16",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
   },
   {
     inputs: [
@@ -239,6 +293,35 @@ export const dstPoolAbi = [
   {
     inputs: [
       {
+        internalType: "uint32",
+        name: "_eid",
+        type: "uint32",
+      },
+      {
+        internalType: "uint16",
+        name: "_msgType",
+        type: "uint16",
+      },
+      {
+        internalType: "bytes",
+        name: "_extraOptions",
+        type: "bytes",
+      },
+    ],
+    name: "combineOptions",
+    outputs: [
+      {
+        internalType: "bytes",
+        name: "",
+        type: "bytes",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "",
         type: "address",
@@ -276,6 +359,30 @@ export const dstPoolAbi = [
         internalType: "contract ILayerZeroEndpointV2",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint32",
+        name: "eid",
+        type: "uint32",
+      },
+      {
+        internalType: "uint16",
+        name: "msgType",
+        type: "uint16",
+      },
+    ],
+    name: "enforcedOptions",
+    outputs: [
+      {
+        internalType: "bytes",
+        name: "enforcedOption",
+        type: "bytes",
       },
     ],
     stateMutability: "view",
@@ -452,6 +559,47 @@ export const dstPoolAbi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "bytes",
+        name: "_message",
+        type: "bytes",
+      },
+      {
+        internalType: "bytes",
+        name: "_extraSendOptions",
+        type: "bytes",
+      },
+      {
+        internalType: "bool",
+        name: "_payInLzToken",
+        type: "bool",
+      },
+    ],
+    name: "quote",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "nativeFee",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "lzTokenFee",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct MessagingFee",
+        name: "totalFee",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "renounceOwnership",
     outputs: [],
@@ -467,6 +615,36 @@ export const dstPoolAbi = [
       },
     ],
     name: "setDelegate",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: "uint32",
+            name: "eid",
+            type: "uint32",
+          },
+          {
+            internalType: "uint16",
+            name: "msgType",
+            type: "uint16",
+          },
+          {
+            internalType: "bytes",
+            name: "options",
+            type: "bytes",
+          },
+        ],
+        internalType: "struct EnforcedOptionParam[]",
+        name: "_enforcedOptions",
+        type: "tuple[]",
+      },
+    ],
+    name: "setEnforcedOptions",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -495,6 +673,11 @@ export const dstPoolAbi = [
         internalType: "uint256",
         name: "_collateralAmount",
         type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "_extraSendOptions",
+        type: "bytes",
       },
     ],
     name: "takeLoan",
@@ -534,7 +717,7 @@ export const dstPoolAbi = [
         type: "tuple",
       },
     ],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {

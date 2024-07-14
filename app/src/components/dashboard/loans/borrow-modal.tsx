@@ -11,7 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 // import { assets } from "@/lib/assets";
+import { Spinner } from "@/components/ui/spinner";
 import { BorrowData, getBorrowSchema, useBorrow } from "@/lib/hooks/loans/use-borrow";
+import { useGetBorrowAmount } from "@/lib/hooks/loans/use-get-borrow-amount";
 import { Pool } from "@/lib/types";
 import { APR_DECIMALS, LTV_DECIMALS } from "@/lib/utils";
 
@@ -39,6 +41,17 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
     watch,
   } = form;
   const collateralAmount = watch("collateralAmount");
+
+  const {
+    data: borrowAmount,
+    error,
+    isPending: isPendingGetBorrowAmount,
+  } = useGetBorrowAmount({
+    pool,
+    collateralAmount,
+  });
+
+  console.log("error: ", error);
 
   const { mutate: borrow, isPending } = useBorrow({
     pool,
@@ -119,7 +132,11 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
             <div className="flex items-center justify-between">
               <div className="text-muted-foreground">Borrow Amount</div>
               <div className="font-medium">
-                {collateralAmount * 2} {pool.asset.symbol}
+                {isPendingGetBorrowAmount ? (
+                  <Spinner />
+                ) : (
+                  `${formatUnits(borrowAmount || BigInt(0), pool.asset.decimals)} ${pool.asset.symbol}`
+                )}
               </div>
               {/* TODO: Calculate borrow amount based on collateral amount */}
             </div>
