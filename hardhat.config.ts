@@ -1,13 +1,13 @@
-import "@nomicfoundation/hardhat-toolbox-viem"
-import "dotenv/config"
-import { HardhatUserConfig } from "hardhat/config"
-import "./scripts/deploy"
-import "./scripts/generate"
-import "./scripts/push"
-import "./scripts/peers"
-import "hardhat-contract-sizer"
+import "@nomicfoundation/hardhat-toolbox-viem";
+import "dotenv/config";
+import { HardhatUserConfig } from "hardhat/config";
+import "./scripts/deploy";
+import "./scripts/generate";
+import "./scripts/push";
+import "./scripts/peers";
+import "hardhat-contract-sizer";
 
-const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
+const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [];
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -24,30 +24,48 @@ const config: HardhatUserConfig = {
     disambiguatePaths: false,
     runOnCompile: true,
     strict: true,
-  },  
+  },
   defaultNetwork: "localhost",
   networks: {
     localhost: {
       url: "http://localhost:8545",
     },
     sepolia: {
-      url: process.env.SEPOLIA_RPC_URL || "https://endpoints.omniatech.io/v1/eth/sepolia/public",
+      url:
+        process.env.SEPOLIA_RPC_URL ||
+        "https://endpoints.omniatech.io/v1/eth/sepolia/public",
       accounts,
     },
     optimism_sepolia: {
-      url: process.env.OPTIMISM_SEPOLIA_RPC_URL || "https://rpc.ankr.com/optimism_sepolia",
+      url:
+        process.env.OPTIMISM_SEPOLIA_RPC_URL ||
+        "https://rpc.ankr.com/optimism_sepolia",
+      accounts,
+    },
+    base_sepolia: {
+      url:
+        process.env.BASE_SEPOLIA_RPC_URL ||
+        "https://base-sepolia.blockpi.network/v1/rpc/public",
       accounts,
     },
     arbitrum_sepolia: {
-      url: process.env.ARBITRUM_SEPOLIA_RPC_URL || "https://arbitrum-sepolia.blockpi.network/v1/rpc/public",
-      accounts
+      url:
+        process.env.ARBITRUM_SEPOLIA_RPC_URL ||
+        "https://arbitrum-sepolia.blockpi.network/v1/rpc/public",
+      accounts,
     },
     zircuit_sepolia: {
       url: process.env.ZIRCUIT_SEPOLIA_RPC_URL || "https://zircuit1.p2pify.com",
-      accounts
+      accounts,
+    },
+    morph: {
+      url: process.env.MORPH_RPC_URL || "https://rpc-holesky.morphl2.io",
+      accounts,
     },
     coston2: {
-      url: process.env.COSTON2_RPC_URL || "https://coston2-api.flare.network/ext/C/rpc",
+      url:
+        process.env.COSTON2_RPC_URL ||
+        "https://coston2-api.flare.network/ext/C/rpc",
       accounts,
     },
     mumbai: {
@@ -55,12 +73,15 @@ const config: HardhatUserConfig = {
       accounts,
     },
     fuji: {
-      url: process.env.FUJI_RPC_URL || "https://avalanche-fuji-c-chain-rpc.publicnode.com",
+      url:
+        process.env.FUJI_RPC_URL ||
+        "https://avalanche-fuji-c-chain-rpc.publicnode.com",
       accounts,
     },
     scroll_sepolia: {
-      url: process.env.SCROLL_SEPOLIA_RPC_URL || "https://sepolia-rpc.scroll.io",
-      accounts
+      url:
+        process.env.SCROLL_SEPOLIA_RPC_URL || "https://sepolia-rpc.scroll.io",
+      accounts,
     },
     linea_sepolia: {
       url:
@@ -69,7 +90,7 @@ const config: HardhatUserConfig = {
     },
   },
   etherscan: {
-    apiKey: "YOUR_ETHERSCAN_API_KEY",
+    apiKey: "C5MN3DAP4RHM66QV9S8QB1RAXZZI3P8FWS",
   },
   gasReporter: {
     enabled: true,
@@ -81,6 +102,6 @@ const config: HardhatUserConfig = {
   sourcify: {
     enabled: true,
   },
-}
+};
 
-export default config
+export default config;

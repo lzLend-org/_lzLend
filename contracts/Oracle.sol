@@ -18,13 +18,19 @@ contract Oracle is OApp {
     ) OApp(_endpoint, _delegate) Ownable(_delegate) {}
 
     function getPrice(uint256 index) external view returns (uint256) {
-        require(index < pythPrices.length && index < flarePrices.length && index < chroniclePrices.length, "Index out of bounds");
+        require(
+            index < pythPrices.length &&
+                index < flarePrices.length &&
+                index < chroniclePrices.length,
+            "Index out of bounds"
+        );
 
         uint256[] memory prices = new uint256[](3);
         prices[0] = pythPrices[index];
         prices[1] = flarePrices[index];
         prices[2] = chroniclePrices[index];
 
+        // NOTE: THINGS DIDNT WORK OUT :(
         // // Check if prices are within TOLERANCE_PERCENT of each other
         // for (uint256 i = 0; i < prices.length; i++) {
         //     for (uint256 j = i + 1; j < prices.length; j++) {
@@ -47,6 +53,18 @@ contract Oracle is OApp {
 
         // Return the median price
         return prices[1];
+    }
+
+    function setPythPrice(uint256[] memory prices) public {
+        pythPrices = prices;
+    }
+
+    function setFlarePrice(uint256[] memory prices) public {
+        flarePrices = prices;
+    }
+
+    function setChroniclePrice(uint256[] memory prices) public {
+        chroniclePrices = prices;
     }
 
     function _lzReceive(

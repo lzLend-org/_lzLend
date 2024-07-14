@@ -12,8 +12,8 @@ contract FlareOracle is OApp, OAppOptionsType3 {
     IFlareContractRegistry internal contractRegistry;
     IFastUpdater internal ftsoV2;
 
-    // Feed indexes: 2 = BTC/USD, 9 = ETH/USD
-    uint256[] public feedIndexes = [2, 9];
+    // Feed indexes: 2 = BTC/USD, 9 = ETH/USD, 16 = USDC/USD
+    uint256[] public feedIndexes = [2, 9, 16];
     uint16 public constant SEND = 1;
 
     uint32[] public dstIds;

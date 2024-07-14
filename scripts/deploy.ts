@@ -1,6 +1,7 @@
 import { task } from "hardhat/config";
 import fs from "fs";
 import path from "path";
+import { verify } from "./utils/verify";
 
 const deployedAddressesPath = path.join(__dirname, "deployedaddresses.json");
 
@@ -31,7 +32,7 @@ task(
 )
   .addParam("contract", "Name of the contract to deploy.")
   .addParam("params", "The parameters of the deployment.")
-  .setAction(async (args, { viem, network }) => {
+  .setAction(async (args, { viem, network, run }) => {
     const contract = await viem.deployContract(
       args.contract,
       JSON.parse(args.params)
@@ -42,4 +43,6 @@ task(
     );
 
     updateDeployedAddresses(args.contract, contract.address, network.name);
+    // verify(run, contract.address, args.params)
+  
   });
