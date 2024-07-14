@@ -17,9 +17,9 @@
 
 # deploy the pool factory
 hh deploy:custom --contract PoolSrcFactory --params '[]' --network zircuit_sepolia
-hh deploy:custom --contract PoolDstFactory --params '[]' --network zircuit_sepolia
+# hh deploy:custom --contract PoolDstFactory --params '[]' --network zircuit_sepolia
 hh deploy:custom --contract PoolSrcFactory --params '[]' --network arbitrum_sepolia
-hh deploy:custom --contract PoolDstFactory --params '[]' --network arbitrum_sepolia
+# hh deploy:custom --contract PoolDstFactory --params '[]' --network arbitrum_sepolia
 
 # setPeer to the different apps
 # # chronicle -> oracle (A)

@@ -4,11 +4,10 @@ pragma solidity ^0.8.24;
 import "./SrcPool.sol";
 
 contract PoolSrcFactory {
-    address[] public allSrcPools;
-    address[] public listedSrcPools;
+    address[] private allSrcPools;
+    address[] private listedSrcPools;
 
-    mapping(address => address[]) public ownerToSrcPools;
-    mapping(address => uint256) public srcPoolPrices;
+    mapping(address => address[]) private ownerToSrcPools;
 
     event DeployedSrcPool(address srcPoolAddress);
 
@@ -43,13 +42,12 @@ contract PoolSrcFactory {
         emit DeployedSrcPool(address(pool));
     }
 
-    function listSrcPool(address srcPoolAddress, uint256 price) external {
+    function listSrcPool(address srcPoolAddress) external {
         require(
             isOwner(msg.sender, srcPoolAddress),
             "Only the owner can list the pool"
         );
         listedSrcPools.push(srcPoolAddress);
-        srcPoolPrices[srcPoolAddress] = price;
     }
 
     function buySrcPool(address srcPoolAddress) external {
@@ -59,29 +57,24 @@ contract PoolSrcFactory {
         removeSrcPoolFromOwner(oldOwner, srcPoolAddress);
         ownerToSrcPools[msg.sender].push(srcPoolAddress);
 
-        srcPoolPrices[srcPoolAddress] = 0;
         removeListedPool(srcPoolAddress);
     }
 
     /* ========== GETTERS ========== */
 
-    // function getSrcPoolsByOwner(address _owner) external view returns (address[] memory) {
-    //     return ownerToSrcPools[_owner];
-    // }
+    function getSrcPoolsByOwner(
+        address _owner
+    ) external view returns (address[] memory) {
+        return ownerToSrcPools[_owner];
+    }
 
-    // function getAllSrcPools() external view returns (address[] memory) {
-    //     return allSrcPools;
-    // }
+    function getAllSrcPools() external view returns (address[] memory) {
+        return allSrcPools;
+    }
 
-    // function getListedSrcPools() external view returns (address[] memory) {
-    //     return listedSrcPools;
-    // }
-
-    // function getSrcPoolPrice(
-    //     address srcPoolAddress
-    // ) external view returns (uint256) {
-    //     return srcPoolPrices[srcPoolAddress];
-    // }
+    function getListedSrcPools() external view returns (address[] memory) {
+        return listedSrcPools;
+    }
 
     /* ========== INTERNAL FUNCTIONS ========== */
 
