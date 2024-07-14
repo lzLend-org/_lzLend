@@ -21,7 +21,12 @@ interface BorrowModalProps extends BaseDialogProps {
   pool: Pool;
 }
 
-export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
+export function BorrowModal({
+  pool,
+  open,
+  onOpenChange,
+  onSuccess,
+}: BorrowModalProps & { onSuccess?: () => void }) {
   // const chainId = useChainId();
   const chains = useChains();
   // const chainAssets = assets[chainId];
@@ -48,13 +53,14 @@ export function BorrowModal({ pool, open, onOpenChange }: BorrowModalProps) {
     isPending: isPendingGetBorrowAmount,
   } = useGetBorrowAmount({
     pool,
-    collateralAmount: 0,
+    collateralAmount: isNaN(collateralAmount) ? 0 : collateralAmount,
   });
 
   console.log("error: ", error);
 
   const { mutate: borrow, isPending } = useBorrow({
     pool,
+    onSuccess,
   });
 
   const onSubmit = handleSubmit((data) => {

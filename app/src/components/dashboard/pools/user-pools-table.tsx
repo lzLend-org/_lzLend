@@ -24,7 +24,11 @@ import { APR_DECIMALS, LTV_DECIMALS, getDaysDifference } from "@/lib/utils";
 export function UserPoolsTable() {
   const { address } = useAccount();
   const chains = useChains();
-  const { data: userPools, isPending } = usePools({
+  const {
+    data: userPools,
+    isPending,
+    refetch,
+  } = usePools({
     owner: address,
     enabled: !!address,
   });
@@ -40,7 +44,14 @@ export function UserPoolsTable() {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Active Deposits</CardTitle>
         <Button onClick={() => setIsModalOpen(true)}>New Deposit</Button>
-        <DepositModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+        <DepositModal
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          onSuccess={() => {
+            refetch();
+            setIsModalOpen(false);
+          }}
+        />
       </CardHeader>
       <CardContent>
         <Table>

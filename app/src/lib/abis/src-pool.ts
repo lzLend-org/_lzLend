@@ -810,7 +810,13 @@ export const srcPoolAbi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "bytes",
+        name: "_extraSendOptions",
+        type: "bytes",
+      },
+    ],
     name: "repayLoan",
     outputs: [
       {

@@ -16,7 +16,12 @@ interface RepayModalProps extends BaseDialogProps {
   loan: Loan;
 }
 
-export function RepayModal({ loan, open, onOpenChange }: RepayModalProps) {
+export function RepayModal({
+  loan,
+  open,
+  onOpenChange,
+  onSuccess,
+}: RepayModalProps & { onSuccess?: () => void }) {
   const chains = useChains();
 
   // const {
@@ -35,8 +40,9 @@ export function RepayModal({ loan, open, onOpenChange }: RepayModalProps) {
   //   console.log(data);
   // });
 
-  const { mutate: repay } = useRepay({
+  const { mutate: repay, isPending } = useRepay({
     loan,
+    onSuccess,
   });
 
   return (
@@ -94,18 +100,14 @@ export function RepayModal({ loan, open, onOpenChange }: RepayModalProps) {
 
           <div className="flex items-center justify-end gap-2">
             <Button
-              // disabled={isPending}
+              disabled={isPending}
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
               Cancel
             </Button>
-            <Button
-              // disabled={isPending}
-              // loading={isPending}
-              onClick={() => repay()}
-            >
+            <Button disabled={isPending} loading={isPending} onClick={() => repay()}>
               Repay
             </Button>
           </div>

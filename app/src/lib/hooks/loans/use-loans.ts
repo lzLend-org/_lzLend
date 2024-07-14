@@ -72,7 +72,7 @@ export function useLoans(params?: UseLoansOptions) {
 
       // console.log("Loans: ", loans);
 
-      return loans.filter((loan): loan is Loan => loan !== null);
+      return loans.filter((loan): loan is Loan => loan !== null && loan.amount > BigInt(0));
     },
   });
 }

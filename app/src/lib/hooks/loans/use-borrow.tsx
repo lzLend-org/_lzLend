@@ -167,7 +167,11 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
       toast({
         title: "Borrow Successfull!",
         description: "Your borrow was successfull",
-        action: <TransactionLinkButton chainId={collateralChain.id as ChainId} txnHash={txnHash} />,
+        action: (
+          <div>
+            <TransactionLinkButton chainId={collateralChain.id as ChainId} txnHash={txnHash} />
+          </div>
+        ),
         variant: "default",
       });
       options?.onSuccess?.(txnHash, variables, context);

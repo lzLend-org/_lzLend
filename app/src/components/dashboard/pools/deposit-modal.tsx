@@ -27,7 +27,11 @@ import { assets } from "@/lib/assets";
 import { DepositData, depositSchema, useDeposit } from "@/lib/hooks/pools/use-deposit";
 import { ChainId } from "@/lib/types";
 
-export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
+export function DepositModal({
+  open,
+  onOpenChange,
+  onSuccess,
+}: BaseDialogProps & { onSuccess?: () => void }) {
   const chainId = useChainId();
   const chains = useChains();
   const chainAssets = assets[chainId];
@@ -53,7 +57,9 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
   const collateralChainId = watch("collateralChainId");
   const collateralChainAssets = assets[collateralChainId as ChainId];
 
-  const { mutate: deposit, isPending } = useDeposit();
+  const { mutate: deposit, isPending } = useDeposit({
+    onSuccess,
+  });
 
   const onSubmit = handleSubmit((data) => {
     deposit(data);

@@ -17,6 +17,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import { pools } from "@/lib/data";
 import { useListedPools } from "@/lib/hooks/marketplace/use-listed-pools";
 import { Pool } from "@/lib/types";
 import { APR_DECIMALS, LTV_DECIMALS, getDaysDifference } from "@/lib/utils";
@@ -28,7 +29,7 @@ export function ListedPoolsTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: listedPools, isPending } = useListedPools();
-  // console.log("Pools: ", data);
+  console.log("listedPools: ", listedPools);
 
   return (
     <Card>
@@ -53,8 +54,8 @@ export function ListedPoolsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {listedPools?.length ? (
-              listedPools.map((pool, index) => (
+            {pools.slice(0, 1)?.length ? (
+              pools.slice(0, 1).map((pool, index) => (
                 <TableRow key={index}>
                   <TableCell>{chains.find((chain) => chain.id === pool.chainId)?.name}</TableCell>
                   <TableCell>{pool.asset.symbol}</TableCell>

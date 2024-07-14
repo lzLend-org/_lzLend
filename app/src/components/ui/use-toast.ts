@@ -6,7 +6,7 @@ import * as React from "react";
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
 
 const TOAST_LIMIT = 5;
-const TOAST_REMOVE_DELAY = 10000000000;
+// const TOAST_REMOVE_DELAY = 10000000000;
 
 type ToasterToast = ToastProps & {
   id: string;
@@ -60,15 +60,15 @@ const addToRemoveQueue = (toastId: string) => {
     return;
   }
 
-  const timeout = setTimeout(() => {
-    toastTimeouts.delete(toastId);
-    dispatch({
-      type: "REMOVE_TOAST",
-      toastId: toastId,
-    });
-  }, TOAST_REMOVE_DELAY);
+  // const timeout = setTimeout(() => {
+  //   toastTimeouts.delete(toastId);
+  //   dispatch({
+  //     type: "REMOVE_TOAST",
+  //     toastId: toastId,
+  //   });
+  // }, TOAST_REMOVE_DELAY);
 
-  toastTimeouts.set(toastId, timeout);
+  // toastTimeouts.set(toastId, timeout);
 };
 
 export const reducer = (state: State, action: Action): State => {
