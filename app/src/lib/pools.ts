@@ -39,6 +39,8 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
     ),
   });
 
+  console.log("poolResults", poolResults);
+
   // console.log("poolResults: ", poolResults);
 
   const poolAddresses: { chainId: ChainId; address: `0x${string}` }[] = [];
@@ -64,7 +66,7 @@ export async function getPools(params?: GetPoolsParams): Promise<Pool[]> {
     ),
   });
 
-  // console.log("poolMetadataResults: ", poolMetadataResults);
+  console.log("poolMetadataResults: ", poolMetadataResults);
 
   const srcPools: (Pool | null)[] = poolMetadataResults.map((result, index) => {
     const poolMetadata = result.result;

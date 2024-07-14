@@ -16,6 +16,19 @@ export const poolSrcFactoryAbi = [
     inputs: [
       {
         internalType: "address",
+        name: "srcPoolAddress",
+        type: "address",
+      },
+    ],
+    name: "buySrcPool",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "_endpoint",
         type: "address",
       },
@@ -89,6 +102,19 @@ export const poolSrcFactoryAbi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "getListedSrcPools",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -105,6 +131,19 @@ export const poolSrcFactoryAbi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "srcPoolAddress",
+        type: "address",
+      },
+    ],
+    name: "listSrcPool",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
 ] as const;

@@ -1,6 +1,14 @@
 import { UseMutationOptions, useMutation } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
-import { createWalletClient, http, createPublicClient, parseUnits, erc20Abi } from "viem";
+import {
+  createWalletClient,
+  http,
+  createPublicClient,
+  parseUnits,
+  erc20Abi,
+  encodeAbiParameters,
+  formatEther,
+} from "viem";
 import { useAccount, useChains } from "wagmi";
 import { z } from "zod";
 
@@ -102,6 +110,24 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
 
       console.log("Approved token: ", approveTxnHash);
 
+      /* ------- Get Quote ------- */
+      const message = encodeAbiParameters(
+        [
+          { type: "address", name: "" },
+          { type: "uint256", name: "" },
+        ],
+        [userAddress, parsedCollateralAmount],
+      );
+      const options = "0x0003010011010000000000000000000000000000fde8";
+
+      const quote = await publicClient.readContract({
+        account,
+        address: pool.dstPoolAddress,
+        abi: dstPoolAbi,
+        functionName: "quote",
+        args: [message, options, false],
+      });
+
       /* ------- Borrow ------- */
       // const borrowAsset = assets[collateralChain.id as ChainId].find(
       //   (a) => a.address === pool.asset.address,
@@ -111,12 +137,16 @@ export function useBorrow({ pool, ...options }: UseBorrowOptions) {
       // const borrowAmount = parseUnits(amount.toString(), borrowAsset.decimals);
       // const collateralAmount = (borrowAmount / pool.ltv) * BigInt(10000);
 
+      const value = quote.nativeFee;
+      console.log("Value: ", formatEther(value));
+
       const { request } = await publicClient.simulateContract({
         account,
         address: pool.dstPoolAddress,
         abi: dstPoolAbi,
         functionName: "takeLoan",
-        args: [parsedCollateralAmount],
+        args: [parsedCollateralAmount, options],
+        value,
       });
       const txnHash = await walletClient.writeContract(request);
 

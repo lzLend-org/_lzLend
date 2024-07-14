@@ -15,21 +15,21 @@ export const addresses: Record<string, []> = {};
 export const POOL_SRC_FACTORY_ADDRESS: Record<ChainId, `0x${string}`> = {
   [mainnet.id]: "0x",
   [sepolia.id]: "0x",
-  [arbitrumSepolia.id]: "0x15e00f073322da8c03fe2dd15fae7013c0945e53",
+  [arbitrumSepolia.id]: "0x8379c5f1577a1751a38fbe4fba867b774351100a",
   [baseSepolia.id]: "0x",
   [scrollSepolia.id]: "0x",
   [morphHolesky.id]: "0x",
-  [zircuitTestnet.id]: "0x617d0f12771e2c04b95a39dd658d74287f170bcd",
+  [zircuitTestnet.id]: "0xe2ebd792e2d994e3a5aeb9fd1b0a18b0ae180f67",
 };
 
 export const POOL_DST_FACTORY_ADDRESS: Record<ChainId, `0x${string}`> = {
   [mainnet.id]: "0x",
   [sepolia.id]: "0x",
-  [arbitrumSepolia.id]: "0x2511aac2823d68351a2e8e7c28200a095becf276",
+  [arbitrumSepolia.id]: "0x84bd941cc3c337578964250ce776c7670ad0e81d",
   [baseSepolia.id]: "0x",
   [scrollSepolia.id]: "0x",
   [morphHolesky.id]: "0x",
-  [zircuitTestnet.id]: "0xe1b87465c94c246cfd177bbe0ff6e21e4061dde7",
+  [zircuitTestnet.id]: "0x8594d8016f5467e2c34c51cfc50457b1d78e6ff7",
 };
 
 export const ORACLE_ADDRESS: Record<ChainId, `0x${string}`> = {
