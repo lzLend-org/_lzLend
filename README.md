@@ -1,5 +1,7 @@
 # _lzLend()
 
+![banner-asset](./assets/banner.png)
+
 P2P Cross-Chain Lending With An Aggregated Cross-Chain Oracle.
 
 ## Description
