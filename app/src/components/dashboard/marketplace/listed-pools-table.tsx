@@ -48,6 +48,7 @@ export function ListedPoolsTable() {
               <TableHead>Collateral Chain</TableHead>
               <TableHead>Collateral Asset</TableHead>
               <TableHead>By</TableHead>
+              <TableHead>Price</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -69,6 +70,9 @@ export function ListedPoolsTable() {
                     <Address address={pool.owner} />
                   </TableCell>
                   <TableCell>
+                    {formatUnits(pool.amount / BigInt(2), pool.asset.decimals)} {pool.asset.symbol}
+                  </TableCell>
+                  <TableCell>
                     <Button
                       size="sm"
                       variant="accent"
@@ -84,7 +88,7 @@ export function ListedPoolsTable() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={10} className="text-center">
+                <TableCell colSpan={11} className="text-center">
                   {isPending ? (
                     <div className="flex justify-center py-10">
                       <Spinner />

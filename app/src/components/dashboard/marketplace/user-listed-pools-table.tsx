@@ -3,7 +3,6 @@
 import { formatUnits } from "viem";
 import { useChains } from "wagmi";
 
-import { Address } from "@/components/address";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -40,7 +39,6 @@ export function UserListedPoolsTable() {
               <TableHead>Locked Days</TableHead>
               <TableHead>Collateral Chain</TableHead>
               <TableHead>Collateral Asset</TableHead>
-              <TableHead>By</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -57,9 +55,6 @@ export function UserListedPoolsTable() {
                     {chains.find((chain) => chain.id === pool.collateralChainId)?.name}
                   </TableCell>
                   <TableCell>{pool.collateralAsset.symbol}</TableCell>
-                  <TableCell>
-                    <Address address={pool.owner} />
-                  </TableCell>
                 </TableRow>
               ))
             ) : (

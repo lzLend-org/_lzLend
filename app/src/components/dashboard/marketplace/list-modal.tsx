@@ -4,6 +4,9 @@ import { useChains } from "wagmi";
 
 import { Button } from "@/components/ui/button";
 import { BaseDialogProps, Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { useListPool } from "@/lib/hooks/marketplace/use-list-pool";
 import { Pool } from "@/lib/types";
 import { APR_DECIMALS, LTV_DECIMALS } from "@/lib/utils";
@@ -59,6 +62,24 @@ export function ListModal({ pool, open, onOpenChange }: ListModalProps) {
         <div className="flex items-center justify-between">
           <div className="text-muted-foreground">Collateral Asset</div>
           <div className="font-medium">{pool.collateralAsset.symbol}</div>
+        </div>
+
+        <Separator className="my-3" />
+
+        <div>
+          <Label className="mb-2 block" htmlFor="name">
+            Price ({pool.asset.symbol})
+          </Label>
+          <Input
+            id="name"
+            type="number"
+            autoCapitalize="none"
+            autoCorrect="off"
+            autoComplete="off"
+            tabIndex={-1}
+            step={0.01}
+            disabled={isPending}
+          />
         </div>
 
         <div className="flex items-center justify-end gap-2">

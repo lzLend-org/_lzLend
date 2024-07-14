@@ -17,7 +17,6 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-// import { pools } from "@/lib/data";
 import { usePools } from "@/lib/hooks/pools/use-pools";
 import { Pool } from "@/lib/types";
 import { APR_DECIMALS, LTV_DECIMALS, getDaysDifference } from "@/lib/utils";

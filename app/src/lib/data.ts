@@ -7,7 +7,7 @@ export const pools: Pool[] = [
   {
     chainId: arbitrumSepolia.id,
     asset: assets[arbitrumSepolia.id][0],
-    amount: BigInt(1000000),
+    amount: BigInt(1000000000000000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     apr: BigInt(1),
@@ -20,7 +20,7 @@ export const pools: Pool[] = [
   {
     chainId: arbitrumSepolia.id,
     asset: assets[arbitrumSepolia.id][0],
-    amount: BigInt(1000000),
+    amount: BigInt(1000000000000000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     apr: BigInt(2),
@@ -33,7 +33,7 @@ export const pools: Pool[] = [
   {
     chainId: arbitrumSepolia.id,
     asset: assets[arbitrumSepolia.id][0],
-    amount: BigInt(1000000),
+    amount: BigInt(1000000000000000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     apr: BigInt(2),
@@ -46,7 +46,7 @@ export const pools: Pool[] = [
   {
     chainId: arbitrumSepolia.id,
     asset: assets[arbitrumSepolia.id][0],
-    amount: BigInt(1000000),
+    amount: BigInt(1000000000000000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     apr: BigInt(2),
@@ -59,7 +59,7 @@ export const pools: Pool[] = [
   {
     chainId: arbitrumSepolia.id,
     asset: assets[arbitrumSepolia.id][0],
-    amount: BigInt(1000000),
+    amount: BigInt(1000000000000000000),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     address: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     apr: BigInt(2),
@@ -73,35 +73,35 @@ export const pools: Pool[] = [
 
 export const loans: Loan[] = [
   {
-    amount: BigInt(1000000),
+    amount: BigInt(1000000000000000000),
     collateralAmount: BigInt(800000),
     startDate: BigInt(Date.now()),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     pool: pools[0],
   },
   {
-    amount: BigInt(1000000),
+    amount: BigInt(1000000000000000000),
     collateralAmount: BigInt(800000),
     startDate: BigInt(Date.now()),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     pool: pools[0],
   },
   {
-    amount: BigInt(1000000),
+    amount: BigInt(1000000000000000000),
     collateralAmount: BigInt(800000),
     startDate: BigInt(Date.now()),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     pool: pools[0],
   },
   {
-    amount: BigInt(1000000),
+    amount: BigInt(1000000000000000000),
     collateralAmount: BigInt(800000),
     startDate: BigInt(Date.now()),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
     pool: pools[0],
   },
   {
-    amount: BigInt(1000000),
+    amount: BigInt(1000000000000000000),
     collateralAmount: BigInt(800000),
     startDate: BigInt(Date.now()),
     owner: "0x8d960334c2EF30f425b395C1506Ef7c5783789F3",
