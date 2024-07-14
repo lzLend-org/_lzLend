@@ -18,7 +18,7 @@ export function Toaster() {
       <div className="flex flex-col gap-3">
         {toasts.map(function ({ id, title, description, action, ...props }) {
           return (
-            <Toast key={id} {...props}>
+            <Toast key={id} {...props} duration={15000}>
               <div className="grid gap-1">
                 {title && <ToastTitle>{title}</ToastTitle>}
                 {description && <ToastDescription>{description}</ToastDescription>}
