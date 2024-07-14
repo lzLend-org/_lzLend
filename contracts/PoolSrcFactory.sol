@@ -4,9 +4,11 @@ pragma solidity ^0.8.24;
 import "./SrcPool.sol";
 
 contract PoolSrcFactory {
-    mapping(address => address[]) private ownerToSrcPools;
-
     address[] private allSrcPools;
+    address[] private listedSrcPools;
+
+    mapping(address => address[]) private ownerToSrcPools;
+    mapping(address => uint256) private srcPoolPrices;
 
     event DeployedSrcPool(address srcPoolAddress);
 
@@ -41,13 +43,91 @@ contract PoolSrcFactory {
         emit DeployedSrcPool(address(pool));
     }
 
-    /* ========== GETTERS ========== */
-
-    function getSrcPoolsByOwner(address _owner) external view returns (address[] memory) {
-        return ownerToSrcPools[_owner];
+    function listSrcPool(address srcPoolAddress, uint256 price) external {
+        require(
+            isOwner(msg.sender, srcPoolAddress),
+            "Only the owner can list the pool"
+        );
+        listedSrcPools.push(srcPoolAddress);
+        srcPoolPrices[srcPoolAddress] = price;
     }
 
-    function getAllSrcPools() external view returns (address[] memory) {
-        return allSrcPools;
+    function buySrcPool(address srcPoolAddress) external {
+        address oldOwner = getOwner(srcPoolAddress);
+
+        // Transfer the pool ownership
+        removeSrcPoolFromOwner(oldOwner, srcPoolAddress);
+        ownerToSrcPools[msg.sender].push(srcPoolAddress);
+
+        srcPoolPrices[srcPoolAddress] = 0;
+        removeListedPool(srcPoolAddress);
+    }
+
+    /* ========== GETTERS ========== */
+
+    // function getSrcPoolsByOwner(address _owner) external view returns (address[] memory) {
+    //     return ownerToSrcPools[_owner];
+    // }
+
+    // function getAllSrcPools() external view returns (address[] memory) {
+    //     return allSrcPools;
+    // }
+
+    function getListedSrcPools() external view returns (address[] memory) {
+        return listedSrcPools;
+    }
+
+    function getSrcPoolPrice(
+        address srcPoolAddress
+    ) external view returns (uint256) {
+        return srcPoolPrices[srcPoolAddress];
+    }
+
+    /* ========== INTERNAL FUNCTIONS ========== */
+
+    function isOwner(
+        address owner,
+        address srcPoolAddress
+    ) internal view returns (bool) {
+        address[] memory pools = ownerToSrcPools[owner];
+        for (uint256 i = 0; i < pools.length; i++) {
+            if (pools[i] == srcPoolAddress) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function getOwner(address srcPoolAddress) internal view returns (address) {
+        for (uint256 i = 0; i < allSrcPools.length; i++) {
+            if (isOwner(msg.sender, srcPoolAddress)) {
+                return msg.sender;
+            }
+        }
+        return address(0);
+    }
+
+    function removeSrcPoolFromOwner(
+        address owner,
+        address srcPoolAddress
+    ) internal {
+        address[] storage pools = ownerToSrcPools[owner];
+        for (uint256 i = 0; i < pools.length; i++) {
+            if (pools[i] == srcPoolAddress) {
+                pools[i] = pools[pools.length - 1];
+                pools.pop();
+                break;
+            }
+        }
+    }
+
+    function removeListedPool(address srcPoolAddress) internal {
+        for (uint256 i = 0; i < listedSrcPools.length; i++) {
+            if (listedSrcPools[i] == srcPoolAddress) {
+                listedSrcPools[i] = listedSrcPools[listedSrcPools.length - 1];
+                listedSrcPools.pop();
+                break;
+            }
+        }
     }
 }
