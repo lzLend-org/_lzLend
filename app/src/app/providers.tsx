@@ -26,7 +26,7 @@ const queryClient = new QueryClient();
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <DynamicContextProvider
         settings={{
           environmentId: env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID,
