@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useState } from "react";
 import { formatUnits } from "viem";
-import { useChains } from "wagmi";
+import { useAccount, useChains } from "wagmi";
 
 import { RepayModal } from "@/components/dashboard/loans/repay-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
   TableHeader,
@@ -16,7 +17,8 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { loans } from "@/lib/data";
+// import { loans } from "@/lib/data";
+import { useLoans } from "@/lib/hooks/loans/use-loans";
 import { Loan } from "@/lib/types";
 import { APR_DECIMALS } from "@/lib/utils";
 
@@ -25,6 +27,12 @@ export function UserLoansTable() {
 
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { address } = useAccount();
+  const { data: userLoans, isPending } = useLoans({
+    owner: address,
+    enabled: !!address,
+  });
 
   return (
     <Card>
@@ -49,35 +57,49 @@ export function UserLoansTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loans.map((loan, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  {chains.find((chain) => chain.id === loan.pool.chainId)?.name}
-                </TableCell>
-                <TableCell>{loan.pool.asset.symbol}</TableCell>
-                <TableCell>{formatUnits(loan.amount, loan.pool.asset.decimals)}</TableCell>
-                <TableCell>{formatUnits(loan.pool.apr, APR_DECIMALS)}%</TableCell>
-                <TableCell>
-                  {chains.find((chain) => chain.id === loan.pool.collateralChainId)?.name}
-                </TableCell>
-                <TableCell>{loan.pool.collateralAsset.symbol}</TableCell>
-                <TableCell>
-                  {formatUnits(loan.collateralAmount, loan.pool.collateralAsset.decimals)}
-                </TableCell>
-                <TableCell>
-                  <Button
-                    size="sm"
-                    variant="accent"
-                    onClick={() => {
-                      setIsModalOpen(true);
-                      setSelectedLoan(loan);
-                    }}
-                  >
-                    Repay
-                  </Button>
+            {userLoans?.length ? (
+              userLoans.map((loan, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    {chains.find((chain) => chain.id === loan.pool.chainId)?.name}
+                  </TableCell>
+                  <TableCell>{loan.pool.asset.symbol}</TableCell>
+                  <TableCell>{formatUnits(loan.amount, loan.pool.asset.decimals)}</TableCell>
+                  <TableCell>{formatUnits(loan.pool.apr, APR_DECIMALS)}%</TableCell>
+                  <TableCell>
+                    {chains.find((chain) => chain.id === loan.pool.collateralChainId)?.name}
+                  </TableCell>
+                  <TableCell>{loan.pool.collateralAsset.symbol}</TableCell>
+                  <TableCell>
+                    {formatUnits(loan.collateralAmount, loan.pool.collateralAsset.decimals)}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      size="sm"
+                      variant="accent"
+                      onClick={() => {
+                        setIsModalOpen(true);
+                        setSelectedLoan(loan);
+                      }}
+                    >
+                      Repay
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={10} className="text-center">
+                  {isPending ? (
+                    <div className="flex justify-center py-10">
+                      <Spinner />
+                    </div>
+                  ) : (
+                    "No active loans"
+                  )}
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
         {selectedLoan && (
