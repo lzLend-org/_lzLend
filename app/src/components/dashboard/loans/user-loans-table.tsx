@@ -67,7 +67,7 @@ export function UserLoansTable() {
                 <TableCell>
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="accent"
                     onClick={() => {
                       setIsModalOpen(true);
                       setSelectedLoan(loan);

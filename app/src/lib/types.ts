@@ -7,6 +7,7 @@ export interface Asset {
   symbol: string;
   address: `0x${string}`;
   decimals: number;
+  oraclePriceIndex: number;
 }
 
 export interface Pool {

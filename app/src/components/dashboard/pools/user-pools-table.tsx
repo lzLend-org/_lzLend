@@ -7,6 +7,7 @@ import { useAccount, useChains } from "wagmi";
 import { DepositModal } from "@/components/dashboard/pools/deposit-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
   TableHeader,
@@ -15,19 +16,19 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { pools } from "@/lib/data";
+// import { pools } from "@/lib/data";
 import { usePools } from "@/lib/hooks/pools/use-pools";
 import { APR_DECIMALS, LTV_DECIMALS, getDaysDifference } from "@/lib/utils";
 
 export function UserPoolsTable() {
   const { address } = useAccount();
   const chains = useChains();
-  const { data } = usePools({
+  const { data: userPools, isPending } = usePools({
     owner: address,
     enabled: !!address,
   });
 
-  console.log("User Pools: ", data);
+  // console.log("User Pools: ", data);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -53,24 +54,38 @@ export function UserPoolsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pools.map((pool, index) => (
-              <TableRow key={index}>
-                <TableCell>{chains.find((chain) => chain.id === pool.chainId)?.name}</TableCell>
-                <TableCell>{pool.asset.symbol}</TableCell>
-                <TableCell>{formatUnits(pool.amount, pool.asset.decimals)}</TableCell>
-                <TableCell>{formatUnits(pool.apr, APR_DECIMALS)}%</TableCell>
-                <TableCell>{formatUnits(pool.ltv, LTV_DECIMALS)}%</TableCell>
-                <TableCell>{getDaysDifference(pool.expireDate)} days</TableCell>
-                <TableCell>
-                  {chains.find((chain) => chain.id === pool.collateralChainId)?.name}
-                </TableCell>
-                <TableCell>
-                  <Button size="sm" variant="outline">
-                    List for Sale
-                  </Button>
+            {userPools?.length ? (
+              userPools.map((pool, index) => (
+                <TableRow key={index}>
+                  <TableCell>{chains.find((chain) => chain.id === pool.chainId)?.name}</TableCell>
+                  <TableCell>{pool.asset.symbol}</TableCell>
+                  <TableCell>{formatUnits(pool.amount, pool.asset.decimals)}</TableCell>
+                  <TableCell>{formatUnits(pool.apr, APR_DECIMALS)}%</TableCell>
+                  <TableCell>{formatUnits(pool.ltv, LTV_DECIMALS)}%</TableCell>
+                  <TableCell>{getDaysDifference(pool.expireDate)} days</TableCell>
+                  <TableCell>
+                    {chains.find((chain) => chain.id === pool.collateralChainId)?.name}
+                  </TableCell>
+                  <TableCell>
+                    <Button size="sm" variant="accent">
+                      List for Sale
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center">
+                  {isPending ? (
+                    <div className="flex justify-center py-10">
+                      <Spinner />
+                    </div>
+                  ) : (
+                    "No active deposits"
+                  )}
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>

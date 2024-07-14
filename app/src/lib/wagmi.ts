@@ -6,7 +6,7 @@ import {
   scrollSepolia,
   sepolia,
   morphHolesky,
-  // zircuitTestnet,
+  zircuitTestnet,
 } from "viem/chains";
 import { createConfig } from "wagmi";
 
@@ -24,7 +24,7 @@ export const config = createConfig({
     baseSepolia,
     scrollSepolia,
     morphHolesky,
-    // zircuitTestnet,
+    zircuitTestnet,
   ],
   multiInjectedProviderDiscovery: false,
   transports: {
@@ -34,6 +34,6 @@ export const config = createConfig({
     [baseSepolia.id]: http(),
     [scrollSepolia.id]: http(),
     [morphHolesky.id]: http(),
-    // [zircuitTestnet.id]: http(),
+    [zircuitTestnet.id]: http(),
   },
 });

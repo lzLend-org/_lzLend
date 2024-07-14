@@ -1,17 +1,4 @@
-export const poolFactoryAbi = [
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "dstPoolAddress",
-        type: "address",
-      },
-    ],
-    name: "DeployedDstPool",
-    type: "event",
-  },
+export const poolSrcFactoryAbi = [
   {
     anonymous: false,
     inputs: [
@@ -24,34 +11,6 @@ export const poolFactoryAbi = [
     ],
     name: "DeployedSrcPool",
     type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_endpoint",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_delegate",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_collateralToken",
-        type: "address",
-      },
-      {
-        internalType: "uint32",
-        name: "_dstChainId",
-        type: "uint32",
-      },
-    ],
-    name: "deployDstPool",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
   },
   {
     inputs: [
@@ -82,6 +41,16 @@ export const poolFactoryAbi = [
       },
       {
         internalType: "address",
+        name: "_oracleAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256[]",
+        name: "_oraclePricesIndex",
+        type: "uint256[]",
+      },
+      {
+        internalType: "address",
         name: "_collateralToken",
         type: "address",
       },
@@ -108,39 +77,7 @@ export const poolFactoryAbi = [
   },
   {
     inputs: [],
-    name: "getAllDstPools",
-    outputs: [
-      {
-        internalType: "address[]",
-        name: "",
-        type: "address[]",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "getAllSrcPools",
-    outputs: [
-      {
-        internalType: "address[]",
-        name: "",
-        type: "address[]",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_owner",
-        type: "address",
-      },
-    ],
-    name: "getDstPoolsByOwner",
     outputs: [
       {
         internalType: "address[]",

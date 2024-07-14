@@ -28,6 +28,16 @@ export const srcPoolAbi = [
       },
       {
         internalType: "address",
+        name: "_oracleAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256[]",
+        name: "_oraclePricesIndex",
+        type: "uint256[]",
+      },
+      {
+        internalType: "address",
         name: "_collateralToken",
         type: "address",
       },
@@ -304,6 +314,16 @@ export const srcPoolAbi = [
             internalType: "address",
             name: "poolToken",
             type: "address",
+          },
+          {
+            internalType: "address",
+            name: "oracleAddress",
+            type: "address",
+          },
+          {
+            internalType: "uint256[]",
+            name: "oraclePricesIndex",
+            type: "uint256[]",
           },
           {
             internalType: "address",
@@ -584,6 +604,11 @@ export const srcPoolAbi = [
       {
         internalType: "address",
         name: "poolToken",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "oracleAddress",
         type: "address",
       },
       {

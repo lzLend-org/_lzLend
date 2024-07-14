@@ -52,7 +52,7 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
   const collateralChainId = watch("collateralChainId");
   const collateralChainAssets = assets[collateralChainId as ChainId];
 
-  const { mutate: deposit } = useDeposit();
+  const { mutate: deposit, isPending } = useDeposit();
 
   const onSubmit = handleSubmit((data) => {
     deposit(data);
@@ -78,7 +78,11 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
               render={({ field }) => (
                 <FormItem className="space-y-0">
                   <FormLabel className="mb-2 block">Asset</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={isPending}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select an asset" />
@@ -108,7 +112,7 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
                 autoCorrect="off"
                 autoComplete="off"
                 step={0.01}
-                // disabled={isPending}
+                disabled={isPending}
                 {...register("amount", { valueAsNumber: true })}
               />
               {errors?.amount && (
@@ -127,7 +131,7 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
                 autoCorrect="off"
                 autoComplete="off"
                 step={0.01}
-                // disabled={isPending}
+                disabled={isPending}
                 {...register("interestRate", { valueAsNumber: true })}
               />
               {errors?.interestRate && (
@@ -146,7 +150,7 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
                 autoCorrect="off"
                 autoComplete="off"
                 step={0.01}
-                // disabled={isPending}
+                disabled={isPending}
                 {...register("ltv", { valueAsNumber: true })}
               />
               {errors?.ltv && <p className="px-1 text-xs text-destructive">{errors.ltv.message}</p>}
@@ -163,7 +167,7 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
                 autoCorrect="off"
                 autoComplete="off"
                 step={1}
-                // disabled={isPending}
+                disabled={isPending}
                 {...register("daysLocked", { valueAsNumber: true })}
               />
               {errors?.daysLocked && (
@@ -182,6 +186,7 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
                       field.onChange(parseInt(value));
                     }}
                     defaultValue={field.value.toString()}
+                    disabled={isPending}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -207,7 +212,11 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
               render={({ field }) => (
                 <FormItem className="space-y-0">
                   <FormLabel className="mb-2 block">Collateral Asset</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={chainAssets[0].address}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={chainAssets[0].address}
+                    disabled={isPending}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select an asset" />
@@ -228,17 +237,14 @@ export function DepositModal({ open, onOpenChange }: BaseDialogProps) {
 
             <div className="flex items-center justify-end gap-2">
               <Button
-                // disabled={isPending}
+                disabled={isPending}
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
               >
                 Cancel
               </Button>
-              <Button
-              // disabled={isPending}
-              // loading={isPending}
-              >
+              <Button disabled={isPending} loading={isPending}>
                 Deposit
               </Button>
             </div>

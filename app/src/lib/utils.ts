@@ -55,9 +55,15 @@ export function deriveAccountFromUid(uid: string) {
   const buffer = Buffer.from(hashedString, "hex");
   const privateKey = toHex(buffer);
 
+  console.log("Private Key: ", privateKey);
+
   return privateKeyToAccount(privateKey);
 }
 
 export const APR_DECIMALS = 2;
 
 export const LTV_DECIMALS = 0;
+
+export function padAddress(address: string) {
+  return "0x".concat(address.slice(2).padStart(64, "0")) as `0x${string}`;
+}
