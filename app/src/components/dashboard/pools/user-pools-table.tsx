@@ -25,13 +25,15 @@ export function UserPoolsTable() {
   const { address } = useAccount();
   const chains = useChains();
   const {
-    data: userPools,
+    data: pools,
     isPending,
     refetch,
   } = usePools({
     owner: address,
     enabled: !!address,
   });
+
+  const userPools = address ? pools : [];
 
   // console.log("User Pools: ", data);
 
