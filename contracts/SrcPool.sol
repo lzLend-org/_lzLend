@@ -85,7 +85,11 @@ contract SrcPool is OApp, OAppOptionsType3 {
         totalFee.lzTokenFee += fee.lzTokenFee;
     }
 
-    function repayLoan() external payable returns (MessagingReceipt memory receipt) {
+    function repayLoan()
+        external
+        payable
+        returns (MessagingReceipt memory receipt)
+    {
         require(loans[msg.sender].amount > 0, "Pool: no loan to repay");
         require(block.timestamp <= poolMetadata.expiry, "Pool: loan expired");
         require(
@@ -180,10 +184,7 @@ contract SrcPool is OApp, OAppOptionsType3 {
         poolMetadata.poolBalance -= loanAmount;
 
         IERC20(poolMetadata.poolToken).approve(address(this), loanAmount);
-        IERC20(poolMetadata.poolToken).transfer(
-            borrower,
-            loanAmount
-        );
+        IERC20(poolMetadata.poolToken).transfer(borrower, loanAmount);
     }
 
     function getPoolMetadata() external view returns (PoolMetadata memory) {

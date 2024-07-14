@@ -82,13 +82,13 @@ contract DstPool is OApp, OAppOptionsType3 {
         bytes calldata /*_extraData*/
     ) internal override {
         address borrower = abi.decode(payload, (address));
-        require(
-            IERC20(collateralToken).transferFrom(
-                address(this),
-                borrower,
-                depositedCollateral[borrower]
-            ),
-            "DstPool: transfer failed"
+        IERC20(collateralToken).approve(
+            address(this),
+            depositedCollateral[borrower]
+        );
+        IERC20(collateralToken).transfer(
+            borrower,
+            depositedCollateral[borrower]
         );
         delete depositedCollateral[borrower];
     }
