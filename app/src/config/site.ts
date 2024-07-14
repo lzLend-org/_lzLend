@@ -9,7 +9,7 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  name: "Web3 Starter",
+  name: "_lzLend()",
   description: "The best Web3 starter to win every hackathon",
   url: "http://localhost:3000",
   ogImage: "https://localhost:3000/og.png",

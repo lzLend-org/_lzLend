@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn("min-h-screen font-sans antialiased", fontSans.variable)}>
+      <body className={cn("min-h-screen font-mono antialiased", fontSans.variable)}>
         <Providers>
           <div className="flex min-h-screen flex-col">
             <Header />
