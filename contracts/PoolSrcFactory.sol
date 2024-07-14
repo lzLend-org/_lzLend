@@ -4,11 +4,11 @@ pragma solidity ^0.8.24;
 import "./SrcPool.sol";
 
 contract PoolSrcFactory {
-    address[] private allSrcPools;
-    address[] private listedSrcPools;
+    address[] public allSrcPools;
+    address[] public listedSrcPools;
 
-    mapping(address => address[]) private ownerToSrcPools;
-    mapping(address => uint256) private srcPoolPrices;
+    mapping(address => address[]) public ownerToSrcPools;
+    mapping(address => uint256) public srcPoolPrices;
 
     event DeployedSrcPool(address srcPoolAddress);
 
@@ -73,15 +73,15 @@ contract PoolSrcFactory {
     //     return allSrcPools;
     // }
 
-    function getListedSrcPools() external view returns (address[] memory) {
-        return listedSrcPools;
-    }
+    // function getListedSrcPools() external view returns (address[] memory) {
+    //     return listedSrcPools;
+    // }
 
-    function getSrcPoolPrice(
-        address srcPoolAddress
-    ) external view returns (uint256) {
-        return srcPoolPrices[srcPoolAddress];
-    }
+    // function getSrcPoolPrice(
+    //     address srcPoolAddress
+    // ) external view returns (uint256) {
+    //     return srcPoolPrices[srcPoolAddress];
+    // }
 
     /* ========== INTERNAL FUNCTIONS ========== */
 

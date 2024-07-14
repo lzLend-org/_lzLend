@@ -4,9 +4,9 @@ pragma solidity ^0.8.24;
 import "./DstPool.sol";
 
 contract PoolDstFactory {
-    mapping(address => address[]) private ownerToDstPools;
+    mapping(address => address[]) public ownerToDstPools;
 
-    address[] private allDstPools;
+    address[] public allDstPools;
 
     event DeployedDstPool(address dstPoolAddress);
 

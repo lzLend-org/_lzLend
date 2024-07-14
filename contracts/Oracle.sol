@@ -25,14 +25,14 @@ contract Oracle is OApp {
         prices[1] = flarePrices[index];
         prices[2] = chroniclePrices[index];
 
-        // Check if prices are within TOLERANCE_PERCENT of each other
-        for (uint256 i = 0; i < prices.length; i++) {
-            for (uint256 j = i + 1; j < prices.length; j++) {
-                uint256 maxPrice = prices[i] > prices[j] ? prices[i] : prices[j];
-                uint256 minPrice = prices[i] < prices[j] ? prices[i] : prices[j];
-                require(maxPrice <= minPrice * (100 + TOLERANCE_PERCENT) / 100, "Prices are not within tolerance");
-            }
-        }
+        // // Check if prices are within TOLERANCE_PERCENT of each other
+        // for (uint256 i = 0; i < prices.length; i++) {
+        //     for (uint256 j = i + 1; j < prices.length; j++) {
+        //         uint256 maxPrice = prices[i] > prices[j] ? prices[i] : prices[j];
+        //         uint256 minPrice = prices[i] < prices[j] ? prices[i] : prices[j];
+        //         require(maxPrice <= minPrice * (100 + TOLERANCE_PERCENT) / 100, "Prices are not within tolerance");
+        //     }
+        // }
 
         // Sort the prices array
         for (uint256 i = 0; i < prices.length - 1; i++) {
