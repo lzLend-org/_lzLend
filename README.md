@@ -20,3 +20,21 @@ The core infrastructure of our system relies on LayerZero, a protocol designed f
 Another crucial component of our infrastructure is the cross-chain oracles. These oracles aggregate price feeds from various chains and relay them to all participating networks. By doing so, we ensure a consistent and reliable source of price data across all chains. This cross-chain oracle system is our single source of truth for lending operations, providing a secure and dependable basis for evaluating collateral and loan terms.
 
 By combining LayerZero's messaging capabilities with our robust cross-chain oracle system, we create a secure, efficient, and interconnected lending platform that transcends the limitations of individual blockchains.
+
+## Deployment
+
+### Front-end
+
+```bash
+pnpm install
+pnpm run dev
+```
+
+### Smart Contracts
+
+Choose the contracts you want to deploy in the `/scripts/massDeploy.sh`.
+
+```bash
+chmod +x ./scripts/massDeploy.sh
+./scripts/massDeploy.sh
+```
